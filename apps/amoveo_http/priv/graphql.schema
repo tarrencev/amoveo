@@ -1,20 +1,12 @@
 type Block {
-  +description(text: "Height of this block")
   height: Int!
-  +description(text: "Hash of previous block header")
   prev_hash: String
-  +description(text: "Hash summarizing all state Merkle trees (e.g. accounts, channels) as after application of transactions")
   trees_hash: String
-  +description(text: "Approximate timestamp of blocks mining")
   time: Int
-  +description(text: "Blocks mining difficulty")
   difficulty: Int
   period: Int
-  +description(text: "Protocol version")
   version: Int
-  +description(text: "Proof of Work nonce")
-  nonce: Int
-  +description(text: "Number of VEO in circulation")
+  nonce: String
   market_cap: Int
   channels_veo: Int
   live_channels: Int
