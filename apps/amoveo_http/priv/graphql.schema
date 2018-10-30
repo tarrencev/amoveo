@@ -7,7 +7,7 @@ type Block {
   period: Int
   version: Int
   nonce: String
-  market_cap: Int
+  market_cap: String
   channels_veo: Int
   live_channels: Int
   many_accounts: Int
@@ -15,6 +15,54 @@ type Block {
   live_oracles: Int
 }
 
+type Header {
+  height: Int!
+  prev_hash: String
+  trees_hash: String
+  txs_proof_hash: String
+  time: Int
+  difficulty: Int
+  version: Int
+  nonce: String
+  accumulative_difficulty: String
+  period: Int
+}
+
+type Account {
+  balance: String
+  nonce: Int
+  pubkey: String
+  bets: String
+  bets_hash: String
+}
+
+# type Oracle {
+#   id: ID!
+#   result: String
+#   question: String
+#   starts: Int
+#   type: Int
+#   orders: Int
+#   creator: String
+#   done_timer: Int
+#   governance: Int
+#   governance_amount: Int
+# }
+#
+# type Key {
+#   id: ID
+#   pub: String
+# }
+#
+# type Bet {
+#   code: String
+#   amount: String
+#   key: String
+#   meta: String
+# }
+
 type Query {
+  account(pubkey: String): Account
   block(height: Int): Block
+  header(height: Int): Header
 }

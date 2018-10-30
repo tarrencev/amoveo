@@ -55,7 +55,9 @@ load_schema() ->
     Mapping = #{
        interfaces => #{ default => graphql_type },
        objects => #{
+         'Account' => graphql_account,
          'Block' => graphql_block,
+         'Header' => graphql_header,
          'Query' => graphql_query }
      },
     ok = graphql:load_schema(Mapping, SchemaData),
