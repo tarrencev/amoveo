@@ -18,7 +18,9 @@ enum TransactionType {
 
 type CoinbaseTransaction {
   type: TransactionType
-  to: String
+  from: String
+  nonce: Int
+  fee: String
 }
 
 type SpendTransaction {
@@ -42,7 +44,7 @@ type CreateAccountTransaction {
   signature: String
 }
 
-union Transaction = CoinbaseTransaction | SpendTransaction
+union Transaction = CoinbaseTransaction | SpendTransaction | CreateAccountTransaction
 
 type Block {
   height: Int!
