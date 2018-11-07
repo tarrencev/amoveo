@@ -44,7 +44,16 @@ type CreateAccountTransaction {
   signature: String
 }
 
-union Transaction = CoinbaseTransaction | SpendTransaction | CreateAccountTransaction
+type DeleteAccountTransaction {
+  type: TransactionType
+  from: String
+  nonce: Int
+  fee: String
+  to: String
+  signature: String
+}
+
+union Transaction = CoinbaseTransaction | SpendTransaction | CreateAccountTransaction | DeleteAccountTransaction
 
 type Block {
   height: Int!
@@ -85,19 +94,55 @@ type Account {
   bets_hash: String
 }
 
-# type Oracle {
-#   id: ID!
-#   result: String
-#   question: String
-#   starts: Int
-#   type: Int
-#   orders: Int
-#   creator: String
-#   done_timer: Int
-#   governance: Int
-#   governance_amount: Int
-# }
-#
+enum GovernanceOracleVariable {
+  NONE
+  BLOCK_REWARD
+  DEVELOPER_REWARD
+  TIME_GAS
+  MAX_BLOCK_SIZE
+  FUN_LIMIT
+  VAR_LIMIT
+  ORACLE_INITIAL_LIQUIDITY
+  MINIMUM_ORACLE_TIME
+  MAXIMUM_ORACLE_TIME
+  MAXIMUM_QUESTION_SIZE
+  GOVERNANCE_CHANGE_LIMIT
+  CREATE_ACC_TX
+  SPEND
+  DELETE_ACC_TX
+  NC
+  CTC
+  CSC
+  TIMEOUT
+  CS
+  EX
+  ORACLE_NEW
+  ORACLE_BET
+  ORACLE_CLOSE
+  UNMATCHED
+  ORACLE_WINNINGS
+}
+
+enum OracleType {
+  EMPTY
+  TRUE
+  FALSE
+  BAD_QUESTION
+}
+
+type Oracle {
+  id: ID!
+  result: String
+  question: String
+  starts: Int
+  type: OracleType
+  # orders: Int
+  creator: String
+  done_timer: Int
+  governance: GovernanceOracleVariable
+  governance_amount: Int
+}
+
 # type Key {
 #   id: ID
 #   pub: String
@@ -114,4 +159,5 @@ type Query {
   account(pubkey: String): Account
   block(height: Int): Block
   header(height: Int): Header
+  oracles: [Oracle]
 }
