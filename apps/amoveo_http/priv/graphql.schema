@@ -1,3 +1,49 @@
+enum TransactionType {
+  COINBASE
+  SPEND
+  CREATE_ACCOUNT
+  DELETE_ACCOUNT
+  MULTI
+  NEW_CHANNEL
+  CHANNEL_TEAM_CLOSE
+  CHANNEL_SOLO_CLOSE
+  CHANNEL_SLASH
+  CHANNEL_TIMEOUT
+  ORACLE_NEW
+  ORACLE_BET
+  ORACLE_CLOSE
+  ORACLE_UNMATCHED
+  ORACLE_WINNINGS
+}
+
+type CoinbaseTransaction {
+  type: TransactionType
+  to: String
+}
+
+type SpendTransaction {
+  type: TransactionType
+  from: String
+  nonce: Int
+  fee: String
+  to: String
+  amount: String
+  version: Int
+  signature: String
+}
+
+type CreateAccountTransaction {
+  type: TransactionType
+  from: String
+  nonce: Int
+  fee: String
+  pubkey: String
+  amount: String
+  signature: String
+}
+
+union Transaction = CoinbaseTransaction | SpendTransaction
+
 type Block {
   height: Int!
   prev_hash: String
@@ -13,6 +59,7 @@ type Block {
   many_accounts: Int
   many_oracles: Int
   live_oracles: Int
+  transactions: [Transaction]
 }
 
 type Header {

@@ -8,11 +8,11 @@ execute(_Ctx, Header, Field, Args) ->
         <<"height">> ->
           {ok, Header#header.height};
         <<"prev_hash">> ->
-          {ok, Header#header.prev_hash};
+          {ok, base64:encode(Header#header.prev_hash)};
         <<"trees_hash">> ->
-          {ok, Header#header.trees_hash};
+          {ok, base64:encode(Header#header.trees_hash)};
         <<"txs_proof_hash">> ->
-          {ok, Header#header.txs_proof_hash};
+          {ok, base64:encode(Header#header.txs_proof_hash)};
         <<"time">> ->
           {ok, Header#header.time};
         <<"difficulty">> ->
@@ -20,7 +20,7 @@ execute(_Ctx, Header, Field, Args) ->
         <<"version">> ->
           {ok, Header#header.version};
         <<"nonce">> ->
-          {ok, Header#header.nonce};
+          {ok, base64:encode(Header#header.nonce)};
         <<"period">> ->
           {ok, Header#header.period};
         <<"accumulative_difficulty">> ->
