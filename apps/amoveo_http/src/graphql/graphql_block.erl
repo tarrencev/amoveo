@@ -8,9 +8,9 @@ execute(_Ctx, Block, Field, Args) ->
         <<"height">> ->
           {ok, Block#block.height};
         <<"prev_hash">> ->
-          {ok, Block#block.prev_hash};
+          {ok, base64:encode(Block#block.prev_hash)};
         <<"trees_hash">> ->
-          {ok, Block#block.trees_hash};
+          {ok, base64:encode(Block#block.trees_hash)};
         <<"time">> ->
           {ok, Block#block.time};
         <<"difficulty">> ->

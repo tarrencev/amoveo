@@ -10,9 +10,9 @@ execute(_Ctx, Account, Field, Args) ->
         <<"nonce">> ->
           {ok, Account#acc.nonce};
         <<"pubkey">> ->
-          {ok, Account#acc.pubkey};
+          {ok, base64:encode(Account#acc.pubkey)};
         <<"bets">> ->
           {ok, Account#acc.bets};
         <<"bets_hash">> ->
-          {ok, Account#acc.bets_hash}
+          {ok, base64:encode(Account#acc.bets_hash)}
     end.
