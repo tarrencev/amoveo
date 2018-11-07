@@ -13,5 +13,7 @@ execute(_, _, Field, Args) ->
       {ok, block:block_to_header(block:get_by_height(Height))};
     <<"block">> ->
       #{ <<"height">> := Height } = Args,
-      {ok, block:get_by_height(Height)}
+      {ok, block:get_by_height(Height)};
+    <<"oracles">> ->
+      {ok, [{ok, M} || M <- oracles:all()]}
   end.

@@ -54,6 +54,8 @@ load_schema() ->
                          filename:join(PrivDir, SchemaFile)),
     Mapping = #{
       enums => #{ 'TransactionType' => graphql_enum,
+                  'GovernanceOracleVariable' => graphql_enum,
+                  'OracleType' => graphql_enum,
                    default   => graphql_enum },
        interfaces => #{ default => graphql_type },
        unions => #{ default => graphql_unions },
@@ -63,6 +65,8 @@ load_schema() ->
          'Header' => graphql_header,
          'CoinbaseTransaction' => graphql_coinbase_transaction,
          'CreateAccountTransaction' => graphql_create_account_transaction,
+         'DeleteAccountTransaction' => graphql_delete_account_transaction,
+         'Oracle' => graphql_oracle,
          'SpendTransaction' => graphql_spend_transaction,
          'Query' => graphql_query,
          default => graphql_object }

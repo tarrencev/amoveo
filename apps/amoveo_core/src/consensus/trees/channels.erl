@@ -2,8 +2,8 @@
 -export([new/7, acc1/1, acc2/1, id/1, bal1/1, bal2/1, last_modified/1, nonce/1, delay/1, amount/1, closed/1, %custom for this tree
 	 write/2, get/2, delete/2,%update tree stuff
          dict_update/9, dict_delete/2, dict_write/2, dict_get/2,%update dict stuff
-         verify_proof/4, make_leaf/3, key_to_int/1, 
-	 deserialize/1, serialize/1, 
+         verify_proof/4, make_leaf/3, key_to_int/1,
+	 deserialize/1, serialize/1,
 	 all/0, close_many/0,
 	 test/0]).%common tree stuff
 %This is the part of the channel that is written onto the hard drive.
@@ -16,8 +16,8 @@
 		  bal2 = 0, %part of the money initially controlled by acc2.
 		  amount = 0, %this is how we remember the outcome of the last contract we tested, that way we can undo it.
 		  nonce = 1,%How many times has this channel-state been updated. If your partner has a state that was updated more times, then they can use it to replace your final state.
-		  last_modified = 0,%this is used to know if a channel_timeout_tx can be called yet. 
-		  delay = 0,%this is the minimum of how long you have to wait since "last_modified" to do a channel_timeout_tx. 
+		  last_modified = 0,%this is used to know if a channel_timeout_tx can be called yet.
+		  delay = 0,%this is the minimum of how long you have to wait since "last_modified" to do a channel_timeout_tx.
                   %every time a channel_slash_tx happens, this delay is updated. This is how long you need to wait before you can do a channel_timeout tx.
 		  closed = 0 %when a channel is closed, set this to 1. The channel can no longer be modified, but the VM has access to the state it was closed on. So you can use a different channel to trustlessly pay whoever slashed.
 		  %channels closed flag is unused because we delete closed channels.
@@ -37,7 +37,7 @@ closed(C) -> C#channel.closed.
 %shares(C) -> C#channel.shares.
 
 dict_update(ID, Dict, Nonce, Inc1, Inc2, Amount, Delay, Height, Close0) ->
-    Close = case Close0 of 
+    Close = case Close0 of
                 1 -> 1;
                 0 -> 0;
                 true -> 1;
@@ -49,7 +49,7 @@ dict_update(ID, Dict, Nonce, Inc1, Inc2, Amount, Delay, Height, Close0) ->
     CNonce = Channel#channel.nonce,
     NewNonce = if
 		   Nonce == none -> CNonce;
-		   true -> 
+		   true ->
 		       Nonce
 	       end,
     T1 = Channel#channel.last_modified,
@@ -69,11 +69,11 @@ dict_update(ID, Dict, Nonce, Inc1, Inc2, Amount, Delay, Height, Close0) ->
                         closed = Close
 		       },
     C.
-    
+
 new(ID, Acc1, Acc2, Bal1, Bal2, Height, Delay) ->
-    #channel{id = ID, acc1 = Acc1, acc2 = Acc2, 
-	     bal1 = Bal1, bal2 = Bal2, 
-	     last_modified = Height, 
+    #channel{id = ID, acc1 = Acc1, acc2 = Acc2,
+	     bal1 = Bal1, bal2 = Bal2,
+	     last_modified = Height,
 	     delay = Delay}.
 serialize(C) ->
     %ACC = constants:address_bits(),
@@ -82,7 +82,7 @@ serialize(C) ->
     NON = constants:channel_nonce_bits(),
     CID = C#channel.id,
     Delay = constants:channel_delay_bits(),
-    %<<CID2:256>> = <<CID:256>>, 
+    %<<CID2:256>> = <<CID:256>>,
     %CID2 = CID,
     Amount = C#channel.amount,
     HB = constants:half_bal(),
@@ -125,9 +125,9 @@ deserialize(B) ->
        B2:PS
        %_:HS
     >> = B,
-    #channel{id = <<ID:HS>>, acc1 = <<B1:PS>>, acc2 = <<B2:PS>>, 
+    #channel{id = <<ID:HS>>, acc1 = <<B1:PS>>, acc2 = <<B2:PS>>,
 	     bal1 = B3, bal2 = B4, amount = B8-constants:half_bal(),
-	     nonce = B5, 
+	     nonce = B5,
 	     last_modified = B7,
 	     delay = B12, closed = Closed}.
 dict_write(Channel, Dict) ->
@@ -140,7 +140,7 @@ write(Channel, Root) ->
     M = serialize(Channel),
     %Shares = Channel#channel.shares,
     trie:put(key_to_int(ID), M, 0, Root, channels). %returns a pointer to the new root
-key_to_int(X) -> 
+key_to_int(X) ->
     <<_:256>> = X,
     <<Y:256>> = hash:doit(X),
     Y.
@@ -161,7 +161,7 @@ get(ID, Channels) ->
 	    L -> deserialize(leaf:value(L))
 	end,
     {RH, V, Proof}.
-dict_delete(Key, Dict) ->      
+dict_delete(Key, Dict) ->
     dict:store({channels, Key}, 0, Dict).
 delete(ID,Channels) ->
     trie:delete(ID, Channels, channels).
@@ -192,8 +192,8 @@ close_many2([A|T], K, H, Fee) ->
     A2 = A#channel.acc2,
     H2 = A#channel.last_modified + A#channel.delay,
     if
-	(not (A2 == K)) -> ok; %only close the ones that are opened with the server, 
-	H2 < H -> ok; %only close the ones that have waited long enough to be closed, 
+	(not (A2 == K)) -> ok; %only close the ones that are opened with the server,
+	H2 < H -> ok; %only close the ones that have waited long enough to be closed,
 	true ->
 	    Tx = channel_timeout_tx:make_dict(A#channel.acc1, A#channel.id, Fee),
 	    Stx = keys:sign(Tx),
@@ -201,14 +201,14 @@ close_many2([A|T], K, H, Fee) ->
     end,
     close_many2(T, K, H, Fee).
 
-%keep the ones that are opened with the server, 
+%keep the ones that are opened with the server,
     %B = lists:filter(fun(C) -> C#channel.acc2 == K end, A),
-%keep the ones that have waited long enough to be closed, 
+%keep the ones that have waited long enough to be closed,
     %C = lists:filter(fun(C) -> (C#channel.last_modified + C#channel.delay) > H end, B),
 %then make a channel_timeout_tx for them all.
     %lists:map(fun(C) -> tx_pool_feeder:absorb_async(keys:sign(channel_timeout_tx(C#channel.acc1, C#channel.id, Fee))) end, C).
-    
-    
+
+
 test() ->
     ID = <<1:256>>,
     Acc1 = constants:master_pub(),
@@ -224,5 +224,3 @@ test() ->
     {Root, C, Proof} = get(ID, NewLoc),
     true = verify_proof(Root, ID, serialize(C), Proof),
     success.
-    
-

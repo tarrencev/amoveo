@@ -90,6 +90,10 @@
                         fee = 0,
                         pubkey = <<>>,
                         amount = 0}).
+-record(delete_acc_tx, {from = 0,
+                        nonce = 0,
+                        fee = 0,
+                        to = 0}).
 -record(coinbase, {from = 0, nonce = 0, fee = 0}).
 -record(multi_tx, {from = 0,
 		  nonce = 0,
