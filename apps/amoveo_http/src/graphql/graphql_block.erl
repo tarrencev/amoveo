@@ -32,5 +32,7 @@ execute(_Ctx, Block, Field, Args) ->
         <<"many_oracles">> ->
           {ok, Block#block.many_accounts};
         <<"live_oracles">> ->
-          {ok, Block#block.many_accounts}
+          {ok, Block#block.many_accounts};
+        <<"transactions">> ->
+          {ok, [{ok, M} || M <- Block#block.txs]}
     end.

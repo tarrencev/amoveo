@@ -53,12 +53,19 @@ load_schema() ->
     {ok, SchemaData} = file:read_file(
                          filename:join(PrivDir, SchemaFile)),
     Mapping = #{
+      enums => #{ 'TransactionType' => graphql_enum,
+                   default   => graphql_enum },
        interfaces => #{ default => graphql_type },
+       unions => #{ default => graphql_unions },
        objects => #{
          'Account' => graphql_account,
          'Block' => graphql_block,
          'Header' => graphql_header,
-         'Query' => graphql_query }
+         'CoinbaseTransaction' => graphql_coinbase_transaction,
+         'CreateAccountTransaction' => graphql_create_account_transaction,
+         'SpendTransaction' => graphql_spend_transaction,
+         'Query' => graphql_query,
+         default => graphql_object }
      },
     ok = graphql:load_schema(Mapping, SchemaData),
     Root = {root,

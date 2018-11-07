@@ -1,6 +1,5 @@
 -module(coinbase_tx).
 -export([go/3, make/2, make_dict/1, from/1]).
--record(coinbase, {from = 0, nonce = 0, fee = 0}).
 -include("../../records.hrl").
 from(X) -> X#coinbase.from.
 make_dict(From) ->
@@ -14,11 +13,11 @@ make(From, Trees) ->
 go(Tx, Dict, NewHeight) ->
     From = Tx#coinbase.from,
     X = accounts:dict_get(From, Dict),
-    %io:fwrite(Dict),%contains the key {governance, 1}, 
+    %io:fwrite(Dict),%contains the key {governance, 1},
     BlockReward = governance:dict_get_value(block_reward, Dict),
     Nacc = case X of
                empty -> accounts:new(From, BlockReward);
-               _ -> 
+               _ ->
                    accounts:dict_update(From, Dict, BlockReward, none)
            end,
     Dict2 = accounts:dict_write(Nacc, Dict),
@@ -26,4 +25,3 @@ go(Tx, Dict, NewHeight) ->
     DeveloperReward = (BlockReward * DeveloperRewardVar) div 10000,
     M = accounts:dict_update(constants:master_pub(), Dict2, DeveloperReward, none),
     accounts:dict_write(M, Dict2).
-
