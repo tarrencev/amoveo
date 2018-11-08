@@ -100,3 +100,4 @@
 		  fee = 0,
 		  txs = []}).
 -record(signed, {data = "", sig = "", sig2 = ""}).
+-record(transaction_hash, { hash = "" }).
