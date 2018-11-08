@@ -155,6 +155,20 @@ type Oracle {
 #   meta: String
 # }
 
+input SignedTransactionInput {
+  transaction: String!
+  sig: String!
+}
+
+type SignedTransactionPayload {
+  hash: String!
+}
+
+type Mutation {
+  submitSignedTransaction(input: SignedTransactionInput!)
+    : SignedTransactionPayload
+}
+
 type Query {
   account(pubkey: String): Account
   block(height: Int): Block

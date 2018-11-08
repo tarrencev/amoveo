@@ -67,12 +67,15 @@ load_schema() ->
          'DeleteAccountTransaction' => graphql_delete_account_transaction,
          'Oracle' => graphql_oracle,
          'SpendTransaction' => graphql_spend_transaction,
+         'SignedTransactionPayload' => graphql_transaction_hash,
          'Query' => graphql_query,
+         'Mutation' => graphql_mutation,
          default => graphql_object }
      },
     ok = graphql:load_schema(Mapping, SchemaData),
     Root = {root,
-            #{ query => 'Query'
+            #{ query => 'Query',
+               mutation => 'Mutation'
              }},
     ok = graphql:insert_schema_definition(Root),
     ok = graphql:validate_schema(),
