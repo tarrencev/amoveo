@@ -12,7 +12,7 @@ execute(_Ctx, Transaction, Field, Args) ->
         <<"fee">> ->
           {ok, Transaction#signed.data#spend.fee};
         <<"to">> ->
-          {ok, Transaction#signed.data#spend.to};
+          {ok, base64:encode(Transaction#signed.data#spend.to)};
         <<"amount">> ->
           {ok, Transaction#signed.data#spend.amount};
         <<"version">> ->
