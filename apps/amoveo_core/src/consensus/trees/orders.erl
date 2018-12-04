@@ -1,9 +1,9 @@
 -module(orders).
 -export([root_hash/1, amount/1,
-         new/2, 
+         new/2,
          get/2, empty_book/0,
          set_amount/2,
-         many/1, head_get/1, 
+         many/1, head_get/1,
          aid/1,
          verify_proof/4,
          serialize/1, deserialize/1, all/1,
@@ -20,7 +20,7 @@
 -record(orders, {aid, amount, pointer}).
 dict_significant_volume(Dict, OID, OIL) ->
     ManyOrders = dict_many(Dict, OID),
-        if 
+        if
             ManyOrders == 0 ->
                 false;
             ManyOrders > 2 -> true;
@@ -29,8 +29,8 @@ dict_significant_volume(Dict, OID, OIL) ->
                 Order0 = dict_get({key, Head, OID}, Dict),
                 amount(Order0) > OIL
         end.
-            
-dict_many(Dict, OID) -> 
+
+dict_many(Dict, OID) ->
     {_, Many} = dict_head_get(Dict, OID),
     Many.
 many(Root) ->
@@ -62,7 +62,7 @@ deserialize_head(X) ->
     AB = PS+BAL,
     <<Head:Y, Many:AB>> = X,
     {<<Head:Y>>, Many}.
-    
+
 serialize(A) ->
     BAL = constants:balance_bits(),
     true = size(A#orders.aid) == constants:pubkey_size(),
@@ -71,7 +71,7 @@ serialize(A) ->
       (A#orders.pointer)/binary,
       (A#orders.aid)/binary>>.
 deserialize(B) ->
-    %OL = constants:orders_bits(),
+    % OL = constants:orders_bits(),
     BAL = constants:balance_bits(),
     PS = constants:pubkey_size() * 8,
     <<Amount:BAL, P:PS,
@@ -79,12 +79,12 @@ deserialize(B) ->
     #orders{aid = <<AID:PS>>, amount = Amount,
               pointer = <<P:PS>>}.
 dict_write(Order, OID, Dict) ->
-    Pub = aid(Order), 
+    Pub = aid(Order),
     Key = {key, Pub, OID},
     dict:store({orders, Key},
                serialize(Order),
                Dict).
-write(X, Root) -> 
+write(X, Root) ->
     V = serialize(X),
     Pubkey = aid(X),
     HPID = key_to_int(Pubkey),
@@ -153,8 +153,8 @@ all2(X, Root) ->
     PS = constants:pubkey_size() * 8,
     case X of
         <<?Null:PS>> -> [<<?Header:PS>>];
-	
-        Pub -> 
+
+        Pub ->
             {_, Order, _} = get(Pub, Root),
             [Pub|all2(Order#orders.pointer, Root)]
     end.
@@ -224,9 +224,9 @@ dict_match(Order, OID, Dict) ->
     %Match1 is orders that are still open.
     %Match2 is orders that are already closed. We need to pay them their winnings.
     {Head, Many} = dict_head_get(Dict, OID),
-    {Switch, Dict2, Matches1, Matches2} = 
+    {Switch, Dict2, Matches1, Matches2} =
         dict_match2(Order, OID, Dict, Head, [], []),
-    {Many2, Switch2} = 
+    {Many2, Switch2} =
         case Switch of
             same_exact -> {Many - length(Matches2), same};
             switch -> {1, switch};
@@ -268,7 +268,7 @@ dict_match2(Order, OID, Dict, T, Matches1, Matches2) ->
                         NewA < OldA ->
                             Order2 = update_amount(L, -NewA),
                             L3 = L#orders{amount = NewA},
-                            {same, dict_write(Order2, OID, Dict), 
+                            {same, dict_write(Order2, OID, Dict),
                              [Order2|Matches1], [L3|Matches2]}
                     end
             end
@@ -277,7 +277,7 @@ dict_match2(Order, OID, Dict, T, Matches1, Matches2) ->
 root_hash(Root) ->
     trie:root_hash(?name, Root).
 make_leaf(Key, V, CFG) ->
-    leaf:new(accounts:key_to_int(Key), 
+    leaf:new(accounts:key_to_int(Key),
              V, 0, CFG).
 verify_proof(RootHash, Key, Value, Proof) ->
     trees:verify_proof(?MODULE, RootHash, Key, Value, Proof).
@@ -299,7 +299,7 @@ test() ->
 
     %Root4 = add(Order1, Root0),
     %{Matches3, Matches4, switch, Root5} = match(Order3, Root4),
-    %{_, empty, _} = get(Pub2, Root5), 
+    %{_, empty, _} = get(Pub2, Root5),
     PS = constants:pubkey_size() * 8,
     %{_, {orders, Pub1, 10, <<?Null:PS>>}, _} = get(Pub1, Root5),
     %{Matches1, Matches2, Matches3, Matches4},

@@ -66,6 +66,7 @@ load_schema() ->
          'CreateAccountTransaction' => graphql_create_account_transaction,
          'DeleteAccountTransaction' => graphql_delete_account_transaction,
          'Oracle' => graphql_oracle,
+         'Order' => graphql_order,
          'SpendTransaction' => graphql_spend_transaction,
          'SignedTransactionPayload' => graphql_transaction_hash,
          'Query' => graphql_query,

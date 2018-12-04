@@ -1,5 +1,6 @@
 -module(graphql_oracle).
 -include("../../amoveo_core/src/records.hrl").
+-include("./graphql_records.hrl").
 
 -export([execute/4]).
 
@@ -11,7 +12,7 @@ execute(_Ctx, {Message, Oracle}, Field, Args) ->
           {ok, Oracle#oracle.result};
         <<"question">> ->
           {ok, Message};
-        <<"question_hash">> ->
+        <<"questionHash">> ->
           {ok, base64:encode(Oracle#oracle.question)};
         <<"starts">> ->
           {ok, Oracle#oracle.starts};
@@ -26,11 +27,22 @@ execute(_Ctx, {Message, Oracle}, Field, Args) ->
             3 ->
               {ok, 'BAD_QUESTION'}
           end;
-        % <<"orders">> ->
-        %   {ok, Oracle#oracle.orders};
+        <<"orders">> ->
+          Oracle2 = trees:get(oracles, Oracle#oracle.id),
+          X = oracles:orders(Oracle2),
+          IDs = orders:all(X),
+          P = lists:map(fun(Y) ->
+            {Root, Data, Path} = orders:get(Y, X),
+            #orderproof{root = Root,
+        		   path = Path,
+        		   value = Data}
+          end, IDs),
+
+          {P2, _} = lists:split(length(P) - 1, P), % remove headers
+          {ok, [{ok, M} || M <- P2]};
         <<"creator">> ->
           {ok, base64:encode(Oracle#oracle.creator)};
-        <<"done_timer">> ->
+        <<"doneTimer">> ->
           {ok, Oracle#oracle.done_timer};
         <<"governance">> ->
           case Oracle#oracle.governance of
@@ -85,6 +97,6 @@ execute(_Ctx, {Message, Oracle}, Field, Args) ->
             24 ->
               {ok, 'ORACLE_WINNINGS'}
           end;
-        <<"governance_amount">> ->
+        <<"governanceAmount">> ->
           {ok, Oracle#oracle.governance_amount}
     end.

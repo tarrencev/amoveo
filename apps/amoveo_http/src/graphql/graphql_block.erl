@@ -7,9 +7,9 @@ execute(_Ctx, Block, Field, Args) ->
     case Field of
         <<"height">> ->
           {ok, Block#block.height};
-        <<"prev_hash">> ->
+        <<"prevHash">> ->
           {ok, base64:encode(Block#block.prev_hash)};
-        <<"trees_hash">> ->
+        <<"treesHash">> ->
           {ok, base64:encode(Block#block.trees_hash)};
         <<"time">> ->
           {ok, Block#block.time};
@@ -21,17 +21,17 @@ execute(_Ctx, Block, Field, Args) ->
           {ok, Block#block.version};
         <<"nonce">> ->
           {ok, Block#block.nonce};
-        <<"market_cap">> ->
+        <<"marketCap">> ->
           {ok, Block#block.market_cap};
-        <<"channels_veo">> ->
+        <<"channelsVeo">> ->
           {ok, Block#block.channels_veo};
-        <<"live_channels">> ->
+        <<"liveChannels">> ->
           {ok, Block#block.live_channels};
-        <<"many_accounts">> ->
+        <<"manyAccounts">> ->
           {ok, Block#block.many_accounts};
-        <<"many_oracles">> ->
+        <<"manyOracles">> ->
           {ok, Block#block.many_accounts};
-        <<"live_oracles">> ->
+        <<"liveOracles">> ->
           {ok, Block#block.many_accounts};
         <<"transactions">> ->
           {ok, [{ok, M} || M <- Block#block.txs]}
