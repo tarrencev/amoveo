@@ -57,27 +57,27 @@ union Transaction = CoinbaseTransaction | SpendTransaction | CreateAccountTransa
 
 type Block {
   height: Int!
-  prev_hash: String
-  trees_hash: String
+  prevHash: String
+  treesHash: String
   time: Int
   difficulty: Int
   period: Int
   version: Int
   nonce: String
-  market_cap: String
-  channels_veo: Int
-  live_channels: Int
-  many_accounts: Int
-  many_oracles: Int
-  live_oracles: Int
+  marketCap: String
+  channelsVeo: Int
+  liveChannels: Int
+  manyAccounts: Int
+  manyOracles: Int
+  liveOracles: Int
   transactions: [Transaction]
 }
 
 type Header {
   height: Int!
-  prev_hash: String
-  trees_hash: String
-  txs_proof_hash: String
+  prevHash: String
+  treesHash: String
+  txs_proofHash: String
   time: Int
   difficulty: Int
   version: Int
@@ -91,7 +91,7 @@ type Account {
   nonce: Int
   pubkey: String
   bets: String
-  bets_hash: String
+  betsHash: String
 }
 
 enum GovernanceOracleVariable {
@@ -130,17 +130,25 @@ enum OracleType {
   BAD_QUESTION
 }
 
+type Order {
+  id: ID!
+  amount: String
+  rootHash: String
+  proof: [String]
+}
+
 type Oracle {
   id: ID!
   result: String
   question: String
   starts: Int
   type: OracleType
-  # orders: Int
+  orderTreeRoot: String
+  orders: [Order]
   creator: String
-  done_timer: Int
+  doneTimer: Int
   governance: GovernanceOracleVariable
-  governance_amount: Int
+  governanceAmount: Int
 }
 
 # type Key {

@@ -101,3 +101,12 @@
 		  txs = []}).
 -record(signed, {data = "", sig = "", sig2 = ""}).
 -record(transaction_hash, { hash = "" }).
+%Each account has a tree of oracle bets. Oracle bets are not transferable. Once an oracle is settled, the bets in it can be converted to shares.
+-record(orders, {aid, amount, pointer}).
+-record(oracle_bet, {from, %your account id.
+		     nonce,
+		     fee,
+		     id, %id is the id of the oracle they want to participate in.
+		     type, %either "true", "false" or "bad_question"
+		     amount,%how many shares do you want to buy?
+				 true, false, bad}).%true, false, and bad are the 3 types of shares that can be purchased from an oracle

@@ -26,7 +26,7 @@ handle(Req, State) ->
 			    spawn(fun() ->
 					  HH = api:height(),
 					  BH = block:height(),
-					  if 
+					  if
 					      HH > BH -> sync:start([{IP, 8080}]);
 					      true -> ok
 					  end
@@ -35,9 +35,9 @@ handle(Req, State) ->
 			_ -> doit(A)
 		    end,
 		packer:pack(B);
-	    _ -> 
+	    _ ->
 		packer:pack({ok, <<"stop spamming the server">>})
-	end,	    
+	end,
 
     Headers = [{<<"content-type">>, <<"application/octet-stream">>},
 	       {<<"Access-Control-Allow-Origin">>, <<"*">>}],
@@ -49,7 +49,7 @@ doit({f, 1}) ->
     {ok, {block:hashes_per_block(),
 	  block:hashrate_estimate(),
 	  block:period_estimate()}};
-doit({account, Pubkey}) -> 
+doit({account, Pubkey}) ->
     {ok, api:account(Pubkey)};
 doit({pubkey}) -> {ok, keys:pubkey()};
 doit({height}) -> {ok, block:height()};
@@ -68,12 +68,12 @@ doit({give_block, Block}) -> %block can also be a list of blocks.
     {ok, R2};
 doit({block, N}) when (is_integer(N) and (N > -1))->
     {ok, block:get_by_height(N)};
-doit({blocks, Many, N}) -> 
+doit({blocks, Many, N}) ->
     true = Many < 60,
     X = block_reader:doit(Many, N),
     %X = many_blocks(Many, N),
     {ok, X};
-doit({header, N}) when is_integer(N) -> 
+doit({header, N}) when is_integer(N) ->
     {ok, block:block_to_header(block:get_by_height(N))};
 doit({header, H}) ->
     case headers:read(H) of
@@ -85,13 +85,13 @@ doit({headers, _H}) ->
     %spawn(fun() ->
 	%	  HH = api:height(),
 	%	  BH = block:height(),
-%		  if 
+%		  if
 %		      HH > BH -> sync:start();
 %		      true -> ok
 %		  end
 %	  end),
     {ok, 0};
-doit({headers, Many, N}) -> 
+doit({headers, Many, N}) ->
     X = many_headers(Many, N),
     {ok, X};
 doit({header}) -> {ok, headers:top()};
@@ -127,16 +127,16 @@ doit({txs, 3, N}) ->
     B = block:get_by_height(N),
     Txs = tl(B#block.txs),
     Txids = lists:map(
-	      fun(Tx) -> hash:doit(testnet_sign:data(Tx)) end, 
+	      fun(Tx) -> hash:doit(testnet_sign:data(Tx)) end,
 	      Txs),
     X = [Txs, Txids],
     {ok, X};
-doit({top}) -> 
+doit({top}) ->
     Top = block:top(),
     {ok, Top, Top#block.height};
-doit({test, -1}) -> 
+doit({test, -1}) ->
     {ok, version:doit(block:height())};
-doit({test}) -> 
+doit({test}) ->
     {test};
 doit({test, N}) ->
     M = 8 * N,
@@ -160,7 +160,7 @@ doit({new_channel, STx, SSPK, Expires}) ->
     {ok, true} = application:get_env(amoveo_core, channels),
     unlocked = keys:status(),
     LifeSpan = Expires - api:height(),
-    {ok, MinimumChannelLifespan} = 
+    {ok, MinimumChannelLifespan} =
         application:get_env(amoveo_core, min_channel_lifespan),
     true = LifeSpan > MinimumChannelLifespan,
     Tx = testnet_sign:data(STx),
@@ -229,11 +229,11 @@ doit({learn_secret, From, Secret, Code}) ->
     io:fwrite(packer:pack([0, OldCD, OldCD#cd.ssme])),
     SS = OldCD#cd.ssme,
     CFME = OldCD#cd.me,
-    {NewSS, SPK, _Secrets, SSThem} = 
+    {NewSS, SPK, _Secrets, SSThem} =
 	spk:bet_unlock(CFME, SS),
     if
 	NewSS == SS -> ok;
-	true -> 
+	true ->
             NewCD = OldCD#cd{me = SPK, ssme = NewSS, ssthem = SSThem, emsg = []},
 	    channel_manager:write(From, NewCD),
 	    {ok, Current} = arbitrage:check(Code),
@@ -254,7 +254,7 @@ doit({bets}) ->
     free_variables:bets();
 doit({proof, TreeName, ID, Hash}) ->
 %here is an example of looking up the 5th governance variable. the word "governance" has to be encoded base64 to be a valid packer:pack encoding.
-%curl -i -d '["proof", "Z292ZXJuYW5jZQ==", 5, Hash]' http://localhost:8080 
+%curl -i -d '["proof", "Z292ZXJuYW5jZQ==", 5, Hash]' http://localhost:8080
     Trees = (block:get_by_hash(Hash))#block.trees,%this line failed.b
     TN = trees:name(TreeName),
     Root = trees:TN(Trees),
@@ -286,7 +286,7 @@ doit({market_data, OID}) ->
     %OBdata is either {binary} or {scalar, LL, UL, ??}
     {ok, {Expires, keys:pubkey(), Period, OBData}};
 doit({trade, Account, Price, Type, Amount, OID, SSPK, Fee}) ->
-    %make sure they pay a fee in channel for having their trade listed. 
+    %make sure they pay a fee in channel for having their trade listed.
     _BetLocation = constants:oracle_bet(),
     {ok, OB} = order_book:data(OID),
     Expires = order_book:expires(OB),
@@ -338,22 +338,22 @@ proof_packer(X) -> X.
 get_header_by_height(N, H) ->
     case H#header.height of
 	N -> H;
-	_ -> 
+	_ ->
 	    {ok, Child} = headers:read(H#header.prev_hash),
 	    get_header_by_height(N, Child)
     end.
-	    
+
 many_headers(Many, X) ->
-    %io:fwrite("many headers "), 
-    %io:fwrite(packer:pack([Many, X])), 
+    %io:fwrite("many headers "),
+    %io:fwrite(packer:pack([Many, X])),
     %io:fwrite("\n"),
     Z = max(0, X + Many - 1),
     H = headers:top(),
     case (H#header.height) >= (X) of
 	false -> [];
 	true ->
-	    {N, Many2} = 
-		if 
+	    {N, Many2} =
+		if
 		    Z < H#header.height ->
 			{Z, Many};
 		    true ->
@@ -382,7 +382,7 @@ many_headers2(Many, H, Out) ->
 %    [block:block_to_header(B)|
 %    blocks2headers(T)].
 %many_headers(M, _) when M < 1 -> [];
-%many_headers(Many, N) ->    
+%many_headers(Many, N) ->
 %    H = api:height(),
 %    if
 %        N > H -> [];
@@ -400,4 +400,3 @@ send_txs2(_, [], []) -> [];
 send_txs2(Checksum, [Checksum|_], [T|_]) -> [T];
 send_txs2(Checksum, [_|CT], [_|T]) ->
     send_txs2(Checksum, CT, T).
-    

@@ -7,11 +7,11 @@ execute(_Ctx, Header, Field, Args) ->
     case Field of
         <<"height">> ->
           {ok, Header#header.height};
-        <<"prev_hash">> ->
+        <<"prevHash">> ->
           {ok, base64:encode(Header#header.prev_hash)};
-        <<"trees_hash">> ->
+        <<"treesHash">> ->
           {ok, base64:encode(Header#header.trees_hash)};
-        <<"txs_proof_hash">> ->
+        <<"txsProofHash">> ->
           {ok, base64:encode(Header#header.txs_proof_hash)};
         <<"time">> ->
           {ok, Header#header.time};
@@ -23,6 +23,6 @@ execute(_Ctx, Header, Field, Args) ->
           {ok, base64:encode(Header#header.nonce)};
         <<"period">> ->
           {ok, Header#header.period};
-        <<"accumulative_difficulty">> ->
+        <<"accumulativeDifficulty">> ->
           {ok, Header#header.accumulative_difficulty}
     end.

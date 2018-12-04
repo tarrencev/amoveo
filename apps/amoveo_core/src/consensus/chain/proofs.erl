@@ -1,5 +1,5 @@
 -module(proofs).
--export([prove/2, test/0, hash/1, facts_to_dict/2, txs_to_querys/3, 
+-export([prove/2, test/0, hash/1, facts_to_dict/2, txs_to_querys/3,
          root/1, tree/1, path/1, value/1, governance_to_querys/1,
          key/1]).
 -define(Header, 1).
@@ -30,9 +30,9 @@ int_to_tree(6) -> governance;
 int_to_tree(7) -> oracle_bets;
 int_to_tree(8) -> orders;
 int_to_tree(9) -> multi_tx.
-    
 
-%deterministic merge-sort    
+
+%deterministic merge-sort
 compare({Ta, Ka}, {Tb, Kb}) ->
     T0 = tree_to_int(Ta),
     T1 = tree_to_int(Tb),
@@ -63,10 +63,10 @@ det_helper(L) ->
     det_helper(det_improve(L)).
 to_lists([]) -> [];
 to_lists([A|T]) -> [[A]|to_lists(T)].
-det_order(Querys) ->    
+det_order(Querys) ->
     F = to_lists(Querys),
     det_helper(F).
-%finished defining merge-sort.       
+%finished defining merge-sort.
 
 prove(Querys, Trees) ->
     F2 = det_order(Querys),
@@ -76,7 +76,7 @@ prove2([], _) ->
 prove2([{orders, Key}|T], Trees) ->
     Oracles = trees:oracles(Trees),
     {_, Data0, _} = oracles:get(Key#key.id, Oracles),
-    OrdersTree = 
+    OrdersTree =
         if
             Data0 == empty ->
                 orders:empty_book();
@@ -120,7 +120,7 @@ prove2([{Tree, Key}|T], Trees) ->
 	    end,
     Proof = #proof{root = Root,
 		  key = Key,
-		  path = Path, 
+		  path = Path,
 		  value = Data2,
 		  tree = tree_to_int(Tree)},
     true = Tree:verify_proof(Root, Key, Data2, Path),
@@ -128,16 +128,16 @@ prove2([{Tree, Key}|T], Trees) ->
 facts_to_dict([], D) -> D;
 facts_to_dict([F|T], D) ->
     Tree = int_to_tree(F#proof.tree),
-    Key2 = 
+    Key2 =
         case Tree of
-            orders -> 
+            orders ->
                 F#proof.key#key.pub;
-            oracle_bets -> 
+            oracle_bets ->
                 F#proof.key#key.id;
 	_ ->
             F#proof.key
     end,
-    true = 
+    true =
         Tree:verify_proof(
           F#proof.root,
           Key2,
@@ -162,7 +162,7 @@ leaves_to_querys([L|T]) ->
     Q = {governance, leaf:key(L)},
     [Q|leaves_to_querys(T)].
 -define(n2i(X), governance:name2number(X)).
-txs_to_querys([C|T], Trees, Height) -> 
+txs_to_querys([C|T], Trees, Height) ->
     case element(1, C) of
         coinbase ->
 	    %FH5 = forks:get(5),
@@ -187,49 +187,49 @@ txs_to_querys2([STx|T], Trees, Height) ->
     L = case element(1, Tx) of
 	    multi_tx ->
 		txs_to_querys_multi(multi_tx:txs(Tx)) ++
-		    [ 
+		    [
 		      {accounts, multi_tx:from(Tx)}
 		     ];
-	    create_acc_tx -> 
+	    create_acc_tx ->
                 [
                  {governance, ?n2i(create_acc_tx)},
                  {accounts, create_account_tx:pubkey(Tx)},
                  {accounts, create_account_tx:from(Tx)}
                 ];
-	    spend -> 
+	    spend ->
                 [
                  {governance, ?n2i(spend)},
                  {accounts, spend_tx:from(Tx)},
                  {accounts, spend_tx:to(Tx)}
                 ];
-	    delete_acc_tx -> 
+	    delete_acc_tx ->
                 [
                  {governance, ?n2i(delete_acc_tx)},
                  {accounts, delete_account_tx:from(Tx)},
                  {accounts, delete_account_tx:to(Tx)}
                   ];
-            nc -> 
+            nc ->
                 [
                  {governance, ?n2i(nc)},
                  {accounts, new_channel_tx:acc1(Tx)},
                  {accounts, new_channel_tx:acc2(Tx)},
                  {channels, new_channel_tx:cid(Tx)}
                 ];
-	    gc -> 
+	    gc ->
                 [
                  {governance, ?n2i(gc)},
                  {accounts, grow_channel_tx:acc1(Tx)},
                  {accounts, grow_channel_tx:acc2(Tx)},
                  {channels, grow_channel_tx:id(Tx)}
                 ];
-	    ctc -> 
+	    ctc ->
                 [
                  {governance, ?n2i(ctc)},
                  {accounts, channel_team_close_tx:aid1(Tx)},
                  {accounts, channel_team_close_tx:aid2(Tx)},
                  {channels, channel_team_close_tx:id(Tx)}
                 ];
-	    csc -> 
+	    csc ->
                 [
                  {governance, ?n2i(csc)},
                  {governance, ?n2i(time_gas)},
@@ -239,14 +239,14 @@ txs_to_querys2([STx|T], Trees, Height) ->
                  {accounts, channel_solo_close:from(Tx)},
                  {channels, channel_solo_close:id(Tx)}
                 ];
-	    timeout -> 
+	    timeout ->
                 [
                  {governance, ?n2i(timeout)},
                  {accounts, channel_timeout_tx:spk_aid1(Tx)},
                  {accounts, channel_timeout_tx:spk_aid2(Tx)},
                  {channels, channel_timeout_tx:cid(Tx)}
                 ];
-	    cs -> 
+	    cs ->
                 [
                  {governance, ?n2i(time_gas)},
                  {governance, ?n2i(space_gas)},
@@ -256,18 +256,18 @@ txs_to_querys2([STx|T], Trees, Height) ->
                  {accounts, channel_slash_tx:from(Tx)},
                  {channels, channel_slash_tx:id(Tx)}
                 ];
-	    ex -> 
+	    ex ->
                 [
                  {governance, ?n2i(ex)},
                  {accounts, existence_tx:from(Tx)},
                  {existence, existence_tx:commit(Tx)}
                 ];
-	    oracle_new -> 
+	    oracle_new ->
                 OID = oracle_new_tx:id(Tx),
                 AID = oracle_new_tx:from(Tx),
 		N2IOIL = ?n2i(oracle_initial_liquidity),
                 G = case oracle_new_tx:governance(Tx) of
-                        0 -> 
+                        0 ->
 			    FH5 = forks:get(5),
 			    B = FH5 < Height,
 			    %B = false,
@@ -288,7 +288,7 @@ txs_to_querys2([STx|T], Trees, Height) ->
                  {accounts, AID},
                  {oracles, OID}
                 ] ++ G;
-	    oracle_bet -> 
+	    oracle_bet ->
                 OID = oracle_bet_tx:id(Tx),
                 Pubkeys = [oracle_bet_tx:from(Tx)|
                            oracle_bet_tx:to_prove(OID, Trees)],
@@ -296,7 +296,7 @@ txs_to_querys2([STx|T], Trees, Height) ->
 		%io:fwrite(packer:pack(Pubkeys)),
 		%io:fwrite("\n"),
                 Pubkeys2 = remove(<<?Header:PS>>, Pubkeys),
-                Prove = tagify(accounts, Pubkeys) ++ 
+                Prove = tagify(accounts, Pubkeys) ++
                     make_oracle_bets(Pubkeys2, OID) ++
                     make_orders(Pubkeys, OID),
                  [
@@ -306,7 +306,7 @@ txs_to_querys2([STx|T], Trees, Height) ->
                   {governance, ?n2i(oracle_initial_liquidity)},
                   {oracles, OID}] ++
                     Prove;
-	    oracle_close -> 
+	    oracle_close ->
                 AID = oracle_close_tx:from(Tx),
                 OID = oracle_close_tx:oracle_id(Tx),
                 Oracles = trees:oracles(Trees),
@@ -336,7 +336,7 @@ txs_to_querys2([STx|T], Trees, Height) ->
                  {oracle_bets, #key{pub = Oracle#oracle.creator, id = OID}},
                  {oracles, OID}
                 ] ++ Prove ++ G;
-	    unmatched -> 
+	    unmatched ->
                 OID = oracle_unmatched_tx:oracle_id(Tx),
                 From = oracle_unmatched_tx:from(Tx),
                 [
@@ -346,7 +346,7 @@ txs_to_querys2([STx|T], Trees, Height) ->
                  {accounts, From},
                  {oracles, OID}
                 ];
-	    oracle_winnings -> 
+	    oracle_winnings ->
                 OID = oracle_winnings_tx:oracle_id(Tx),
                 From = oracle_winnings_tx:from(Tx),
                 [
@@ -356,7 +356,7 @@ txs_to_querys2([STx|T], Trees, Height) ->
                  {accounts, From},
                  {oracles, OID}
                 ];
-	    coinbase_old -> 
+	    coinbase_old ->
                 [
                  {governance, ?n2i(block_reward)},
                  {governance, ?n2i(developer_reward)},
@@ -369,12 +369,12 @@ txs_to_querys_multi([]) -> [];
 txs_to_querys_multi([Tx|T]) ->
     PS = constants:pubkey_size() * 8,
     L = case element(1, Tx) of
-	    create_acc_tx -> 
+	    create_acc_tx ->
                 [
                  {governance, ?n2i(create_acc_tx)},
                  {accounts, create_account_tx:pubkey(Tx)}
                 ];
-	    spend -> 
+	    spend ->
                 [
                  {governance, ?n2i(spend)},
                  {accounts, spend_tx:to(Tx)}
@@ -382,8 +382,8 @@ txs_to_querys_multi([Tx|T]) ->
 	end,
     L ++ txs_to_querys_multi(T).
 
-	    
-    
+
+
 remove(_, []) -> [];
 remove(X, [X|A]) -> remove(X, A);
 remove(X, [Y|A]) -> [Y|remove(X, A)].
@@ -440,7 +440,7 @@ test() ->
     Querys2 = dict:fetch_keys(Dict),
     Facts = prove(Querys2, Trees),
     Dict,
-    
+
     ETxs = "g2wAAAAEaARkAAZzaWduZWRoBmQAAmNhbQAAAEEEhVmGzXqC2hD+5Qy6OXlpK62kiYLi9rwx7CAK96HowS4OOgO+1CphnkV5hxSFj9AuOkIGteOq9O0WI3iWLQ2GOmEBYRRtAAAAQQRHXAXlfMl3JIv7Ni5NmiaAhuff/NsmnCCnWElvuaemWoQ2aCFJzogO/dHY9yrDUsIHaqtS+iD1OW3KuPrpBgoCYjuaygBtAAAAYE1FVUNJUUR5Q0p1Y2h6TlEzUXBkbTk4VjFkWGNxQklEUjVlNDFoRWtlMGRvUkVNd2hBSWdKbjcza3hISzhNUXZDVUttcGEzbzRSWkJYR3FoMXNWV2NZZXNyQ3NRVlo4PWpoBGQABnNpZ25lZGgGZAACY2FtAAAAQQSFWYbNeoLaEP7lDLo5eWkrraSJguL2vDHsIAr3oejBLg46A77UKmGeRXmHFIWP0C46Qga146r07RYjeJYtDYY6YQJhFG0AAABBBFRjuCgudSTRU79SVoCBvWi55+N1QethvQI6LKUCoEPHvIfedkQLxnuD2VJHqoLrULmXyexRWs2sOTwyLsdyL+FiO5rKAG0AAABgTUVVQ0lRRG1naWwvSkxGRVJaN05LUEpZMHZFQ21nZUlsNFdkdU5SbmlzWkw2R25ZVFFJZ1dBOExUazNENEVva3EvWUY4U3d4SnljR1Ixd2RLejlRMWpJUmpyeEFzSDQ9amgEZAAGc2lnbmVkaApkAAJuY20AAABBBIVZhs16gtoQ/uUMujl5aSutpImC4va8MewgCveh6MEuDjoDvtQqYZ5FeYcUhY/QLjpCBrXjqvTtFiN4li0NhjptAAAAQQRUY7goLnUk0VO/UlaAgb1ouefjdUHrYb0COiylAqBDx7yH3nZEC8Z7g9lSR6qC61C5l8nsUVrNrDk8Mi7Hci/hYTJhA2IAACcQYgAAJxFhAmEEYQFtAAAAYE1FWUNJUUQ4U1hNeUYxQmRnbWRaRVdHbWFFR3JncXRxTXUvRGZJYmZVMnE1eE94ZUdnSWhBTTU3L21wcmFucDdiVTBSK2RoMS9wZjBOeHViVWJIU256UEFrcFY5b1gwNW0AAABgTUVVQ0lIeTdhenJyYmxIdzdSdEVmRVRMcU5ERTdCUUhmb1Rnd29CVHlZV0JKcHd0QWlFQWxPcnRhY1k1NVFSNUZUVUpoVFltbW5TWldtSGZ4cFUvbmExbjJsSVhJdm89aARkAAZzaWduZWRoCmQAAm5jbQAAAEEER1wF5XzJdySL+zYuTZomgIbn3/zbJpwgp1hJb7mnplqENmghSc6IDv3R2Pcqw1LCB2qrUvog9Tltyrj66QYKAm0AAABBBFRjuCgudSTRU79SVoCBvWi55+N1QethvQI6LKUCoEPHvIfedkQLxnuD2VJHqoLrULmXyexRWs2sOTwyLsdyL+FhMmEBYgAAJxBiAAAnEWECYQRhAm0AAABgTUVRQ0lCZHlWUUhxRlZyQWFGMTVsN0NmajlyckU5THI3RFFUWVJrc3c5d3dMek1nQWlBOGZrMXpIVVgwdlN6b0dVQ05JTGRmRER5Y2lNMnlWVldLb0pnTGNUbUZhdz09bQAAAGBNRVFDSUJvV3pJQU9oUExqTXJjN0tnV3ZFOUxhWmdXdllqYTY0Mk10YzE0S3RFdXNBaUFhRktDTmNhQUFSck9NUVNCUmZMKzdPV054aHduaWdwRUZBc1JaL0c3MmVBPT1q",
     %Txs = binary_to_term(base64:decode(ETxs)),
     {Pub30, Priv30} = testnet_sign:new_key(),
@@ -455,6 +455,3 @@ test() ->
     Q2 = txs_to_querys2(Txs, Trees, 1),
     prove(Q2, Trees),
     success.
-    
-    
-

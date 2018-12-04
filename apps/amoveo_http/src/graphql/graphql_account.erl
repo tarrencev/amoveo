@@ -13,6 +13,6 @@ execute(_Ctx, Account, Field, Args) ->
           {ok, base64:encode(Account#acc.pubkey)};
         <<"bets">> ->
           {ok, Account#acc.bets};
-        <<"bets_hash">> ->
+        <<"betsHash">> ->
           {ok, base64:encode(Account#acc.bets_hash)}
     end.

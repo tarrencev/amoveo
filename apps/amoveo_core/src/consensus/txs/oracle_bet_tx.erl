@@ -1,13 +1,7 @@
 -module(oracle_bet_tx).
 -export([go/4, go2/3, make/6, make_dict/5, id/1, from/1, to_prove/2]).
 -include("../../records.hrl").
--record(oracle_bet, {from, %your account id.
-		     nonce, 
-		     fee, 
-		     id, %id is the id of the oracle they want to participate in.
-		     type, %either "true", "false" or "bad_question"
-		     amount
-                     }).%how many shares do you want to buy?
+
 %This is how you can participate in an existing oracle.
 %The market is an order book with 3 types of shares: "true", "false", "bad_question"
 %All trades are matched into the order book in pairs at even odds.
@@ -20,14 +14,14 @@ to_prove(OID, Trees) ->
     {_, Oracle, _} = oracles:get(OID, Oracles),
     Orders = Oracle#oracle.orders,
     orders:all(Orders).
-    
+
 from(X) -> X#oracle_bet.from.
 id(X) -> X#oracle_bet.id.
 make_dict(From, Fee, OID, Type, Amount) ->
     <<_:256>> = OID,
     Acc = trees:get(accounts, From),
     Tx = #oracle_bet{
-       from = From, 
+       from = From,
        nonce = Acc#acc.nonce + 1,
        fee = Fee,
        id = OID,
@@ -38,7 +32,7 @@ make(From, Fee, OID, Type, Amount, Trees) ->
     Accounts = trees:accounts(Trees),
     {_, Acc, _Proof} = accounts:get(From, Accounts),
     Tx = #oracle_bet{
-       from = From, 
+       from = From,
        nonce = Acc#acc.nonce + 1,
        fee = Fee,
        id = OID,
@@ -76,7 +70,7 @@ dict_give_bets_main(Id, Orders, Type, Dict, OID) ->
     Amount = sum_order_amounts(Orders, 0),
     oracle_bets:dict_add_bet(Id, OID, Type, 2*Amount, Dict).
 sum_order_amounts([], N) -> N;
-sum_order_amounts([H|T], N) -> 
+sum_order_amounts([H|T], N) ->
     A = orders:amount(H),
     sum_order_amounts(T, A+N).
 dict_give_bets([], _Type, Dict, _OID) -> Dict;
@@ -107,11 +101,11 @@ go2(Tx, Dict, NewHeight) -> %doit is split into two pieces because when we close
     Oracle = if
     %if the volume of trades it too low, then reset the done_timer to another week in the future.
 		 VolumeCheck -> Oracle0;
-		 true -> 
+		 true ->
                      Oracle0#oracle{done_timer = NewHeight + MOT}
 	     end,
     true = NewHeight > Oracle#oracle.starts,
-    %take some money from them. 
+    %take some money from them.
     OracleType = Oracle#oracle.type,%This shouldn't be 0 for the test we are doing.
     TxType = case Tx#oracle_bet.type of
 		 1 -> 1;
@@ -121,11 +115,11 @@ go2(Tx, Dict, NewHeight) -> %doit is split into two pieces because when we close
     Amount = Tx#oracle_bet.amount,
     true = Amount > 0,
     NewOrder = orders:new(Tx#oracle_bet.from, Amount),
-    Out = 
+    Out =
         if
 	TxType == OracleType ->
                 ManyOrders = dict_orders_many(OID, Dict),
-                Minimum = OIL * det_pow(2, max(1, ManyOrders)), 
+                Minimum = OIL * det_pow(2, max(1, ManyOrders)),
                 true = Amount >= Minimum,
                 Dict2 = orders:dict_add(NewOrder, OID, Dict),
                 oracles:dict_write(Oracle, Dict2);
@@ -142,7 +136,7 @@ go2(Tx, Dict, NewHeight) -> %doit is split into two pieces because when we close
 		Dict3 = dict_give_bets_main(From, M3, TxType, Dict2, Oracle#oracle.id),
                 Dict4 = dict_give_bets(Matches2, OracleType, Dict3, Oracle#oracle.id),%gives oracle_bets to each account that got matched
                 Oracle3 = case Next of
-                              same -> 
+                              same ->
                                   io:fwrite("oracle_bet_tx same type\n"),
                                   Oracle;
                               switch ->
@@ -155,4 +149,3 @@ go2(Tx, Dict, NewHeight) -> %doit is split into two pieces because when we close
 dict_orders_many(OID, Dict) ->
     {_, Many} = orders:dict_head_get(Dict, OID),
     Many.
-    
