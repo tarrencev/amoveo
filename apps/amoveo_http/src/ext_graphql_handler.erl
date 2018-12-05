@@ -15,9 +15,18 @@ handle(Req, State) ->
    	{ok, Req3, State2}.
 
 handle_method(<<"POST">>, Req, State) -> handle_post(Req, State);
+
+handle_method(<<"OPTIONS">>, Req, State) ->
+	Headers = [{<<"content-type">>, <<"application/json">>},
+						 {<<"Access-Control-Allow-Origin">>, <<"*">>},
+						 {<<"access-control-allow-methods">>, <<"POST, GET, OPTIONS">>},
+			       {<<"access-control-allow-headers">>, <<"Origin, X-Requested-With, Content-Type, Accept">>},
+			       {<<"access-control-max-age">>, <<"1000">>}],
+	{ok, Reply} = cowboy_req:reply(200, Headers, Req),
+	{ok, Reply, State};
+
 handle_method(Method, Req, State) ->
 		io:fwrite("I can't handle this \n"),
-		io:fwrite(packer:pack(Method)),
 		{ok, Req2} = cowboy_req:reply(404, [{<<"connection">>, <<"close">>}], Req),
 		{ok, Req2, State}.
 
@@ -141,5 +150,6 @@ err(Code, Msg, Req, State) ->
              message => Formatted },
     Body = jsx:encode(#{ errors => [Err] }),
     Req2 = cowboy_req:set_resp_body(Body, Req),
-    {ok, Reply} = cowboy_req:reply(Code, Req2),
+		Headers = [{<<"Access-Control-Allow-Origin">>, <<"*">>}],
+    {ok, Reply} = cowboy_req:reply(Code, Headers, Req2),
     {stop, Reply, State}.

@@ -1,5 +1,6 @@
 -module(graphql_query).
 -include("../../amoveo_core/src/records.hrl").
+-include("./graphql_records.hrl").
 
 -export([execute/4]).
 
@@ -14,6 +15,10 @@ execute(_, _, Field, Args) ->
     <<"block">> ->
       #{ <<"height">> := Height } = Args,
       {ok, block:get_by_height(Height)};
+    <<"height">> ->
+      {ok, api:height()};
+    <<"governance">> ->
+      {ok, #governance{}};
     <<"oracles">> ->
       {ok, [{ok, M} || M <- oracles:all()]}
   end.

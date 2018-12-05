@@ -66,6 +66,7 @@ load_schema() ->
          'CoinbaseTransaction' => graphql_coinbase_transaction,
          'CreateAccountTransaction' => graphql_create_account_transaction,
          'DeleteAccountTransaction' => graphql_delete_account_transaction,
+         'Governance' => graphql_governance,
          'Oracle' => graphql_oracle,
          'Order' => graphql_order,
          'SpendTransaction' => graphql_spend_transaction,

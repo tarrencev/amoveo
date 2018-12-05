@@ -24,37 +24,40 @@ input(<<"OracleType">>, <<"TRUE">>)    -> {ok, 'TRUE'};
 input(<<"OracleType">>, <<"FALSE">>)    -> {ok, 'FALSE'};
 input(<<"OracleType">>, <<"BAD_QUESTION">>)    -> {ok, 'BAD_QUESTION'};
 
-input(<<"GovernanceOracleVariable">>, <<"NONE">>) -> {ok, 'NONE'};
-input(<<"GovernanceOracleVariable">>, <<"BLOCK_REWARD">>) -> {ok, 'BLOCK_REWARD'};
-input(<<"GovernanceOracleVariable">>, <<"DEVELOPER_REWARD">>)  -> {ok, 'DEVELOPER_REWARD'};
-input(<<"GovernanceOracleVariable">>, <<"TIME_GAS">>)    -> {ok, 'TIME_GAS'};
-input(<<"GovernanceOracleVariable">>, <<"MAX_BLOCK_SIZE">>) -> {ok, 'MAX_BLOCK_SIZE'};
-input(<<"GovernanceOracleVariable">>, <<"FUN_LIMIT">>)  -> {ok, 'FUN_LIMIT'};
-input(<<"GovernanceOracleVariable">>, <<"VAR_LIMIT">>)  -> {ok, 'VAR_LIMIT'};
-input(<<"GovernanceOracleVariable">>, <<"ORACLE_INITIAL_LIQUIDITY">>)  -> {ok, 'ORACLE_INITIAL_LIQUIDITY'};
-input(<<"GovernanceOracleVariable">>, <<"MINIMUM_ORACLE_TIME">>)  -> {ok, 'MINIMUM_ORACLE_TIME'};
-input(<<"GovernanceOracleVariable">>, <<"MAXIMUM_ORACLE_TIME">>)  -> {ok, 'MAXIMUM_ORACLE_TIME'};
-input(<<"GovernanceOracleVariable">>, <<"MAXIMUM_QUESTION_SIZE">>)  -> {ok, 'MAXIMUM_QUESTION_SIZE'};
-input(<<"GovernanceOracleVariable">>, <<"GOVERNANCE_CHANGE_LIMIT">>)  -> {ok, 'GOVERNANCE_CHANGE_LIMIT'};
-input(<<"GovernanceOracleVariable">>, <<"CREATE_ACC_TX">>)  -> {ok, 'CREATE_ACC_TX'};
-input(<<"GovernanceOracleVariable">>, <<"DELETE_ACC_TX">>)  -> {ok, 'DELETE_ACC_TX'};
-input(<<"GovernanceOracleVariable">>, <<"NC">>)  -> {ok, 'NC'};
-input(<<"GovernanceOracleVariable">>, <<"CTC">>)  -> {ok, 'CTC'};
-input(<<"GovernanceOracleVariable">>, <<"CSC">>)  -> {ok, 'CSC'};
-input(<<"GovernanceOracleVariable">>, <<"TIMEOUT">>)  -> {ok, 'TIMEOUT'};
-input(<<"GovernanceOracleVariable">>, <<"CS">>)  -> {ok, 'CS'};
-input(<<"GovernanceOracleVariable">>, <<"EX">>)  -> {ok, 'EX'};
-input(<<"GovernanceOracleVariable">>, <<"ORACLE_NEW">>)  -> {ok, 'ORACLE_NEW'};
-input(<<"GovernanceOracleVariable">>, <<"ORACLE_BET">>)  -> {ok, 'ORACLE_BET'};
-input(<<"GovernanceOracleVariable">>, <<"ORACLE_CLOSE">>)  -> {ok, 'ORACLE_CLOSE'};
-input(<<"GovernanceOracleVariable">>, <<"UNMATCHED">>)  -> {ok, 'UNMATCHED'};
-input(<<"GovernanceOracleVariable">>, <<"ORACLE_WINNINGS">>)    -> {ok, 'ORACLE_WINNINGS'}.
+input(<<"GovernanceEnum">>, <<"NONE">>) -> {ok, 'NONE'};
+input(<<"GovernanceEnum">>, <<"BLOCK_REWARD">>) -> {ok, 'BLOCK_REWARD'};
+input(<<"GovernanceEnum">>, <<"DEVELOPER_REWARD">>) -> {ok, 'DEVELOPER_REWARD'};
+input(<<"GovernanceEnum">>, <<"MAX_BLOCK_SIZE">>) -> {ok, 'MAX_BLOCK_SIZE'};
+input(<<"GovernanceEnum">>, <<"BLOCK_PERIOD">>) -> {ok, 'BLOCK_PERIOD'};
+input(<<"GovernanceEnum">>, <<"TIME_GAS">>)    -> {ok, 'TIME_GAS'};
+input(<<"GovernanceEnum">>, <<"SPACE_GAS">>)    -> {ok, 'SPACE_GAS'};
+input(<<"GovernanceEnum">>, <<"FUN_LIMIT">>)  -> {ok, 'FUN_LIMIT'};
+input(<<"GovernanceEnum">>, <<"VAR_LIMIT">>)  -> {ok, 'VAR_LIMIT'};
+input(<<"GovernanceEnum">>, <<"GOVERNANCE_CHANGE_LIMIT">>)  -> {ok, 'GOVERNANCE_CHANGE_LIMIT'};
+input(<<"GovernanceEnum">>, <<"ORACLE_INITIAL_LIQUIDITY">>)  -> {ok, 'ORACLE_INITIAL_LIQUIDITY'};
+input(<<"GovernanceEnum">>, <<"MINIMUM_ORACLE_TIME">>)  -> {ok, 'MINIMUM_ORACLE_TIME'};
+input(<<"GovernanceEnum">>, <<"MAXIMUM_ORACLE_TIME">>)  -> {ok, 'MAXIMUM_ORACLE_TIME'};
+input(<<"GovernanceEnum">>, <<"MAXIMUM_QUESTION_SIZE">>)  -> {ok, 'MAXIMUM_QUESTION_SIZE'};
+input(<<"GovernanceEnum">>, <<"CREATE_ACC_TX">>)  -> {ok, 'CREATE_ACC_TX'};
+input(<<"GovernanceEnum">>, <<"DELETE_ACC_TX">>)  -> {ok, 'DELETE_ACC_TX'};
+input(<<"GovernanceEnum">>, <<"NC">>)  -> {ok, 'NC'};
+input(<<"GovernanceEnum">>, <<"CTC">>)  -> {ok, 'CTC'};
+input(<<"GovernanceEnum">>, <<"CSC">>)  -> {ok, 'CSC'};
+input(<<"GovernanceEnum">>, <<"TIMEOUT">>)  -> {ok, 'TIMEOUT'};
+input(<<"GovernanceEnum">>, <<"CS">>)  -> {ok, 'CS'};
+input(<<"GovernanceEnum">>, <<"EX">>)  -> {ok, 'EX'};
+input(<<"GovernanceEnum">>, <<"ORACLE_NEW">>)  -> {ok, 'ORACLE_NEW'};
+input(<<"GovernanceEnum">>, <<"ORACLE_BET">>)  -> {ok, 'ORACLE_BET'};
+input(<<"GovernanceEnum">>, <<"ORACLE_CLOSE">>)  -> {ok, 'ORACLE_CLOSE'};
+input(<<"GovernanceEnum">>, <<"UNMATCHED">>)  -> {ok, 'UNMATCHED'};
+input(<<"GovernanceEnum">>, <<"ORACLE_WINNINGS">>)    -> {ok, 'ORACLE_WINNINGS'};
+input(<<"GovernanceEnum">>, <<"ORACLE_QUESTION_LIQUIDITY">>)    -> {ok, 'ORACLE_QUESTION_LIQUIDITY'}.
 
 %% Output mapping <2>
 output(<<"TransactionType">>, TransactionType) ->
     {ok, atom_to_binary(TransactionType, utf8)};
-output(<<"GovernanceOracleVariable">>, GovernanceOracleVariable) ->
-    {ok, atom_to_binary(GovernanceOracleVariable, utf8)};
+output(<<"GovernanceEnum">>, GovernanceEnum) ->
+    {ok, atom_to_binary(GovernanceEnum, utf8)};
 output(<<"OracleType">>, OracleType) ->
     {ok, atom_to_binary(OracleType, utf8)}.
 %% end::coreEnum[]

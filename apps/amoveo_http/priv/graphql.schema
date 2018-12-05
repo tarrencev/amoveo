@@ -94,19 +94,21 @@ type Account {
   betsHash: String
 }
 
-enum GovernanceOracleVariable {
+enum GovernanceEnum {
   NONE
   BLOCK_REWARD
   DEVELOPER_REWARD
-  TIME_GAS
   MAX_BLOCK_SIZE
+  BLOCK_PERIOD
+  TIME_GAS
+  SPACE_GAS
   FUN_LIMIT
   VAR_LIMIT
+  GOVERNANCE_CHANGE_LIMIT
   ORACLE_INITIAL_LIQUIDITY
   MINIMUM_ORACLE_TIME
   MAXIMUM_ORACLE_TIME
   MAXIMUM_QUESTION_SIZE
-  GOVERNANCE_CHANGE_LIMIT
   CREATE_ACC_TX
   SPEND
   DELETE_ACC_TX
@@ -121,6 +123,7 @@ enum GovernanceOracleVariable {
   ORACLE_CLOSE
   UNMATCHED
   ORACLE_WINNINGS
+  ORACLE_QUESTION_LIQUIDITY
 }
 
 enum OracleType {
@@ -146,8 +149,8 @@ type Oracle {
   orderTreeRoot: String
   orders: [Order]
   creator: String
-  doneTimer: Int
-  governance: GovernanceOracleVariable
+  ends: Int
+  governance: GovernanceEnum
   governanceAmount: Int
 }
 
@@ -177,9 +180,42 @@ type Mutation {
     : SignedTransactionPayload
 }
 
+type Governance {
+  blockReward: String
+  developerReward: String
+  maxBlockSize: String
+  blockPeriod: String
+  timeGas: String
+  spaceGas: String
+  funLimit: String
+  varLimit: String
+  governanceChangeLimit: String
+  oracleInitialLiquidity: String
+  minimumOracleTime: String
+  maximumOracleTime: String
+  maximumQuestionSize: String
+  createAccountTx: String
+  spendTx: String
+  deleteAccountTx: String
+  newChannelTx: String
+  channelTeamCloseTx: String
+  channelSoloCloseTx: String
+  channelTimeoutTx: String
+  cs: String
+  ex: String
+  oracleNewTx: String
+  oracleBetTx: String
+  oracleCloseTx: String
+  unmatchedTx: String
+  oracleWinningsTx: String
+  oracleQuestionLiquidity: String
+}
+
 type Query {
   account(pubkey: String): Account
   block(height: Int): Block
   header(height: Int): Header
+  height: Int
   oracles: [Oracle]
+  governance: Governance
 }
