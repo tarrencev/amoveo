@@ -4,6 +4,20 @@
 
 -export([execute/4]).
 
+orders(Id) ->
+  Oracle2 = trees:get(oracles, Id),
+  X = oracles:orders(Oracle2),
+  IDs = orders:all(X),
+  P = lists:map(fun(Y) ->
+    {Root, Data, Path} = orders:get(Y, X),
+    #orderproof{root = Root,
+       path = Path,
+       value = Data}
+  end, IDs),
+
+  {P2, _} = lists:split(length(P) - 1, P), % remove headers
+  P2.
+
 execute(_Ctx, {Message, Oracle}, Field, Args) ->
     case Field of
         <<"id">> ->
@@ -28,21 +42,11 @@ execute(_Ctx, {Message, Oracle}, Field, Args) ->
               {ok, 'BAD_QUESTION'}
           end;
         <<"orders">> ->
-          Oracle2 = trees:get(oracles, Oracle#oracle.id),
-          X = oracles:orders(Oracle2),
-          IDs = orders:all(X),
-          P = lists:map(fun(Y) ->
-            {Root, Data, Path} = orders:get(Y, X),
-            #orderproof{root = Root,
-        		   path = Path,
-        		   value = Data}
-          end, IDs),
-
-          {P2, _} = lists:split(length(P) - 1, P), % remove headers
-          {ok, [{ok, M} || M <- P2]};
+          Orders = orders(Oracle#oracle.id),
+          {ok, [{ok, M} || M <- Orders]};
         <<"creator">> ->
           {ok, base64:encode(Oracle#oracle.creator)};
-        <<"doneTimer">> ->
+        <<"ends">> ->
           {ok, Oracle#oracle.done_timer};
         <<"governance">> ->
           case Oracle#oracle.governance of
@@ -53,49 +57,57 @@ execute(_Ctx, {Message, Oracle}, Field, Args) ->
             2 ->
               {ok, 'DEVELOPER_REWARD'};
             3 ->
-              {ok, 'TIME_GAS'};
-            4 ->
               {ok, 'MAX_BLOCK_SIZE'};
+            4 ->
+              {ok, 'BLOCK_PERIOD'};
             5 ->
-              {ok, 'FUN_LIMIT'};
+              {ok, 'TIME_GAS'};
             6 ->
-              {ok, 'VAR_LIMIT'};
+              {ok, 'SPACE_GAS'};
             7 ->
-              {ok, 'ORACLE_INITIAL_LIQUIDITY'};
+              {ok, 'FUN_LIMIT'};
             8 ->
-              {ok, 'MINIMUM_ORACLE_TIME'};
+              {ok, 'VAR_LIMIT'};
             9 ->
-              {ok, 'MAXIMUM_ORACLE_TIME'};
-            10 ->
-              {ok, 'MAXIMUM_QUESTION_SIZE'};
-            11 ->
               {ok, 'GOVERNANCE_CHANGE_LIMIT'};
+            10 ->
+              {ok, 'ORACLE_INITIAL_LIQUIDITY'};
+            11 ->
+              {ok, 'MINIMUM_ORACLE_TIME'};
             12 ->
-              {ok, 'SPEND'};
+              {ok, 'MAXIMUM_ORACLE_TIME'};
             13 ->
-              {ok, 'DELETE_ACC_TX'};
+              {ok, 'MAXIMUM_QUESTION_SIZE'};
             14 ->
-              {ok, 'NC'};
+              {ok, 'CREATE_ACC_TX'};
             15 ->
-              {ok, 'CTC'};
+              {ok, 'SPEND'};
             16 ->
-              {ok, 'CSC'};
+              {ok, 'DELETE_ACC_TX'};
             17 ->
-              {ok, 'TIMEOUT'};
+              {ok, 'NC'};
             18 ->
-              {ok, 'CS'};
+              {ok, 'CTC'};
             19 ->
-              {ok, 'EX'};
+              {ok, 'CSC'};
             20 ->
-              {ok, 'ORACLE_NEW'};
+              {ok, 'TIMEOUT'};
             21 ->
-              {ok, 'ORACLE_BET'};
+              {ok, 'CS'};
             22 ->
-              {ok, 'ORACLE_CLOSE'};
+              {ok, 'EX'};
             23 ->
-              {ok, 'UNMATCHED'};
+              {ok, 'ORACLE_NEW'};
             24 ->
-              {ok, 'ORACLE_WINNINGS'}
+              {ok, 'ORACLE_BET'};
+            25 ->
+              {ok, 'ORACLE_CLOSE'};
+            26 ->
+              {ok, 'UNMATCHED'};
+            27 ->
+              {ok, 'ORACLE_WINNINGS'};
+            28 ->
+              {ok, 'ORACLE_QUESTION_LIQUIDITY'}
           end;
         <<"governanceAmount">> ->
           {ok, Oracle#oracle.governance_amount}
