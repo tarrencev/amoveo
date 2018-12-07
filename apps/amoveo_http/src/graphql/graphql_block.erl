@@ -5,8 +5,9 @@
 
 estimate_future_block_time(Height) ->
     Top = api:height(),
+    TopBlock = block:get_by_height(Top),
     Period = trees:get(governance, block_period),
-    (Height - Top) * Period.
+    (Height - Top) * Period + TopBlock#block.time.
 
 execute(_Ctx, Block, Field, Args) ->
     case Field of
