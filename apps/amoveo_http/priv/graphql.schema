@@ -59,8 +59,8 @@ type Block {
   height: Int!
   prevHash: String
   treesHash: String
-  time: Int
-  difficulty: Int
+  time: String
+  difficulty: String
   period: Int
   version: Int
   nonce: String
@@ -144,14 +144,15 @@ type Oracle {
   id: ID!
   result: String
   question: String
-  starts: Int
+  starts: Block
   type: OracleType
   orderTreeRoot: String
   orders: [Order]
   creator: String
-  ends: Int
+  ends: Block
   governance: GovernanceEnum
   governanceAmount: Int
+  unmatched: String
 }
 
 # type Key {
@@ -201,8 +202,8 @@ type Governance {
   channelTeamCloseTx: String
   channelSoloCloseTx: String
   channelTimeoutTx: String
-  cs: String
-  ex: String
+  channelSlashTx: String
+  existenceProofTx: String
   oracleNewTx: String
   oracleBetTx: String
   oracleCloseTx: String

@@ -1,6 +1,6 @@
 -module(block).
 -export([block_to_header/1, get_by_height_in_chain/2,
-         get_by_height/1, hash/1, get_by_hash/1, 
+         get_by_height/1, hash/1, get_by_hash/1,
          initialize_chain/0, make/4,
          mine/1, mine/2, mine2/2, check/1, check0/1,
          top/0, genesis_maker/0, height/0,
@@ -23,7 +23,7 @@ merkelize_thing(X) when is_tuple(X) and (size(X) > 0)->
         _ -> tx_hash(X)
     end;
 merkelize_thing(X) -> hash:doit(X).
-    
+
 merkelize_pair(A, B) ->
     C = [merkelize_thing(A), merkelize_thing(B)],
     hash:doit(C).
@@ -36,7 +36,7 @@ merkelize2([A]) -> [merkelize_thing(A)];
 merkelize2([A|[B|T]]) ->
     [merkelize_pair(A, B)|
      merkelize2(T)].
-    
+
 txs_proofs_hash(Txs, Proofs) ->
     TB = merkelize(Txs),
     PB = merkelize(Proofs),
@@ -102,8 +102,8 @@ top() -> top(headers:top_with_block()).%what we actually want is the highest hea
 top(Header) ->
     false = element(2, Header) == undefined,
     case get_by_hash(hash(Header)) of
-        empty -> 
-            {ok, PrevHeader} = 
+        empty ->
+            {ok, PrevHeader} =
                 headers:read(Header#header.prev_hash),
             top(PrevHeader);
         Block -> Block
@@ -166,7 +166,7 @@ genesis_maker() ->
 miner_fees([]) -> 0;
 miner_fees([H|T]) ->
     element(4, testnet_sign:data(H)) + miner_fees(T).
-   
+
 tx_costs_dict([], _, Out) -> Out;
 tx_costs_dict([STx|T], Dict, Out) ->
     Tx = testnet_sign:data(STx),
@@ -187,28 +187,28 @@ market_cap(OldBlock, BlockReward, Txs0, Dict, Height) ->
     FH = forks:get(3),
     if
 	FH > Height ->
-	    OldBlock#block.market_cap + 
-		BlockReward - 
+	    OldBlock#block.market_cap +
+		BlockReward -
 		gov_fees(Txs0, Dict);
-	Height == FH -> 
-	    MC1 = OldBlock#block.market_cap + 
-		BlockReward - 
+	Height == FH ->
+	    MC1 = OldBlock#block.market_cap +
+		BlockReward -
 		gov_fees(Txs0, Dict),
 	    (MC1 * 6) div 5;
 	FH < Height ->
-	    DeveloperRewardVar = 
+	    DeveloperRewardVar =
 		governance:dict_get_value(developer_reward, Dict),
-	    DeveloperReward = 
-		(BlockReward * 
-		 DeveloperRewardVar) div 
+	    DeveloperReward =
+		(BlockReward *
+		 DeveloperRewardVar) div
 		10000,
-	    OldBlock#block.market_cap + 
-		BlockReward - 
-		gov_fees(Txs0, Dict) + 
+	    OldBlock#block.market_cap +
+		BlockReward -
+		gov_fees(Txs0, Dict) +
 		DeveloperReward
     end.
-    
-    
+
+
 make(Header, Txs0, Trees, Pub) ->
     {CB, _Proofs} = coinbase_tx:make(Pub, Trees),
     Txs = [CB|lists:reverse(Txs0)],
@@ -219,7 +219,7 @@ make(Header, Txs0, Trees, Pub) ->
     NewDict0 = new_dict(Txs, Dict, Height + 1),
     B = ((Height+1) == forks:get(5)),
     NewDict = if
-		B -> 
+		B ->
 		      OQL = governance:new(governance:name2number(oracle_question_liquidity), constants:oracle_question_liquidity()),
 		      io:fwrite("block governance adjust "),
 		      io:fwrite(packer:pack(OQL)),
@@ -287,9 +287,9 @@ roots_hash(X) when is_record(X, roots) ->
     E = X#roots.existence,
     O = X#roots.oracles,
     G = X#roots.governance,
-    hash:doit(<<A/binary, C/binary, E/binary, 
+    hash:doit(<<A/binary, C/binary, E/binary,
                          O/binary, G/binary>>).
-    
+
 guess_number_of_cpu_cores() ->
     case application:get_env(amoveo_core, test_mode) of
         {ok, true} -> 1;
@@ -299,7 +299,7 @@ guess_number_of_cpu_cores() ->
                     X == unknown ->
                         % Happens on Mac OS X.
                         erlang:system_info(schedulers);
-                    is_integer(X) -> 
+                    is_integer(X) ->
                         %ubuntu
                         X;
                     true -> io:fwrite("number of CPU unknown, only using 1"), 1
@@ -308,10 +308,10 @@ guess_number_of_cpu_cores() ->
             min(Y, CoresToMine)
     end.
 spawn_many(0, _) -> ok;
-spawn_many(N, F) -> 
+spawn_many(N, F) ->
     spawn(F),
     spawn_many(N-1, F).
-mine(Rounds) -> 
+mine(Rounds) ->
     potential_block:save(),
     Block = potential_block:read(),
     case Block of
@@ -361,7 +361,7 @@ proofs_roots_match([], _) -> true;
 proofs_roots_match([P|T], R) ->
     Tree = proofs:tree(P),
     Root = proofs:root(P),
-    Root = 
+    Root =
         case Tree of
             oracle_bets -> Root;
             orders -> Root;
@@ -372,7 +372,7 @@ proofs_roots_match([P|T], R) ->
             governance -> R#roots.governance
            end,
     proofs_roots_match(T, R).
-            
+
 check0(Block) ->%This verifies the txs in ram. is parallelizable
     Facts = Block#block.proofs,
     Header = block_to_header(Block),
@@ -426,7 +426,7 @@ check(Block) ->%This writes the result onto the hard drive database. This is non
     %io:fwrite(packer:pack(erlang:timestamp())),
     %io:fwrite("\n"),
     ok = case BlockSize > MaxBlockSize of
-	     true -> 
+	     true ->
 		 io:fwrite("error, this block is too big\n"),
 		 bad;
 	     false -> ok
@@ -443,7 +443,7 @@ check(Block) ->%This writes the result onto the hard drive database. This is non
     %io:fwrite("\n"),
     B = (Height == forks:get(5)),
     NewDict2 = if
-		B -> 
+		B ->
 		    OQL = governance:new(governance:name2number(oracle_question_liquidity), constants:oracle_question_liquidity()),
 		    governance:dict_write(OQL, NewDict);
 		true -> NewDict
@@ -494,10 +494,10 @@ check(Block) ->%This writes the result onto the hard drive database. This is non
 %            Oracles = trees:oracles(Trees),
 %            Path = proofs:path(Fact),
 %            {_, Oracle, _} = oracles:get(OID, Oracles),
-%            case Oracle of 
-%                empty -> 
+%            case Oracle of
+%                empty ->
 %                    Trees;
-%                _ -> 
+%                _ ->
 %                    Orders = Oracle#oracle.orders,
 %                    Orders2 = setup_tree(0, Orders, Path, Type),
 %                    Orders3 = trees:restore(Orders2, Fact, 0),
@@ -505,7 +505,7 @@ check(Block) ->%This writes the result onto the hard drive database. This is non
 %                    Oracles2 = oracles:write(Oracle2, Oracles),
 %                    trees:update_oracles(Trees, Oracles2)
 %            end;
-%        oracle_bets -> 
+%        oracle_bets ->
 %            {key, Pubkey, _OID} = proofs:key(Fact),
 %            Path = proofs:path(Fact),
 %            Accounts = trees:accounts(Trees),
@@ -530,7 +530,7 @@ no_coinbase([STx|T]) ->
     false = Type == coinbase,
     no_coinbase(T).
 
-initialize_chain() -> 
+initialize_chain() ->
     %only run genesis maker once, or else it corrupts the database.
     {ok, L} = file:list_dir("blocks"),
     %B = length(L) < 1,
@@ -560,20 +560,20 @@ gov_fees2([H|T], Dict) ->
     Type = element(1, H),
     A = governance:dict_get_value(Type, Dict),
     A + gov_fees2(T, Dict).
-    
+
 deltaCV([], _) -> 0;%calculate change in total amount of VEO stored in channels.
 deltaCV([Tx|T], Dict) ->
     C = testnet_sign:data(Tx),
     A = case element(1, C) of
 	    nc -> new_channel_tx:bal1(C) + new_channel_tx:bal2(C);
-	    ctc -> 
+	    ctc ->
 		ID = channel_team_close_tx:id(C),
 		OldChannel = channels:dict_get(ID, Dict),
 		io:fwrite(packer:pack(OldChannel)),
 		Bal1 = channels:bal1(OldChannel),
 		Bal2 = channels:bal2(OldChannel),
 		-(Bal1 + Bal2);
-	    timeout -> 
+	    timeout ->
 		ID = channel_timeout_tx:cid(C),
 		OldChannel = channels:dict_get(ID, Dict),
 		Bal1 = channels:bal1(OldChannel),
@@ -679,11 +679,11 @@ diff2hashes(D) ->
     exponent(2, A) * (256 + B) div 256.
 exponent(_, 0) -> 1;
 exponent(A, 1) -> A;
-exponent(A, N) when N rem 2 == 0 -> 
+exponent(A, N) when N rem 2 == 0 ->
     exponent(A*A, N div 2);
-exponent(A, N) -> 
+exponent(A, N) ->
     A*exponent(A, N-1).
-	    
+
 test() ->
     test(1).
 test(1) ->

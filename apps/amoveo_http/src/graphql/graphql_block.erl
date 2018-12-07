@@ -3,6 +3,11 @@
 
 -export([execute/4]).
 
+estimate_future_block_time(Height) ->
+    Top = api:height(),
+    Period = trees:get(governance, block_period),
+    (Height - Top) * Period.
+
 execute(_Ctx, Block, Field, Args) ->
     case Field of
         <<"height">> ->
@@ -12,7 +17,11 @@ execute(_Ctx, Block, Field, Args) ->
         <<"treesHash">> ->
           {ok, base64:encode(Block#block.trees_hash)};
         <<"time">> ->
-          {ok, Block#block.time};
+          Time = Block#block.time,
+          case Time of
+            undefined -> {ok, estimate_future_block_time(Block#block.height) + constants:start_time()};
+            _ -> {ok, Block#block.time + constants:start_time()}
+          end;
         <<"difficulty">> ->
           {ok, Block#block.difficulty};
         <<"period">> ->

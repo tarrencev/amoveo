@@ -46,9 +46,9 @@ execute(_Ctx, Order, Field, Args) ->
           {ok, trees:get(governance, csc)};
         <<"channelTimeoutTx">> ->
           {ok, trees:get(governance, timeout)};
-        <<"cs">> ->
+        <<"channelSlashTx">> ->
           {ok, trees:get(governance, cs)};
-        <<"ex">> ->
+        <<"existenceProofTx">> ->
           {ok, trees:get(governance, ex)};
         <<"oracleNewTx">> ->
           {ok, trees:get(governance, oracle_new)};
