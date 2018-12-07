@@ -59,7 +59,5 @@ execute(_Ctx, Order, Field, Args) ->
         <<"unmatchedTx">> ->
           {ok, trees:get(governance, unmatched)};
         <<"oracleWinningsTx">> ->
-          {ok, trees:get(governance, oracle_winnings)};
-        <<"oracleQuestionLiquidity">> ->
-          {ok, trees:get(governance, oracle_question_liquidity)}
+          {ok, trees:get(governance, oracle_winnings)}
     end.
