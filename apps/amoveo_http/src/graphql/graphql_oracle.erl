@@ -29,7 +29,11 @@ execute(_Ctx, {Message, Oracle}, Field, Args) ->
         <<"questionHash">> ->
           {ok, base64:encode(Oracle#oracle.question)};
         <<"starts">> ->
-          {ok, Oracle#oracle.starts};
+          Starts = Oracle#oracle.starts,
+          case api:height() < Starts of
+            true -> {ok, #block{height = Starts}}; % block is in the future, return mock block
+            false -> {ok, block:get_by_height(Starts)}
+          end;
         <<"type">> ->
           case Oracle#oracle.type of
             0 ->
@@ -44,10 +48,18 @@ execute(_Ctx, {Message, Oracle}, Field, Args) ->
         <<"orders">> ->
           Orders = orders(Oracle#oracle.id),
           {ok, [{ok, M} || M <- Orders]};
+        <<"unmatched">> ->
+          Orders = orders(Oracle#oracle.id),
+          Amounts = [R#orderproof.value#orders.amount || R <- Orders],
+          {ok, lists:sum(Amounts)};
         <<"creator">> ->
           {ok, base64:encode(Oracle#oracle.creator)};
         <<"ends">> ->
-          {ok, Oracle#oracle.done_timer};
+          Ends = Oracle#oracle.done_timer,
+          case api:height() < Ends of
+            true -> {ok, #block{height = Ends}}; % block is in the future, return mock block
+            false -> {ok, block:get_by_height(Ends)}
+          end;
         <<"governance">> ->
           case Oracle#oracle.governance of
             0 ->

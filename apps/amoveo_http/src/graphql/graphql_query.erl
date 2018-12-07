@@ -20,5 +20,7 @@ execute(_, _, Field, Args) ->
     <<"governance">> ->
       {ok, #governance{}};
     <<"oracles">> ->
-      {ok, [{ok, M} || M <- oracles:all()]}
+      Oracles = oracles:all(),
+      SortedOracles = lists:sort(fun({_, X}, {_, Y}) -> X#oracle.starts > Y#oracle.starts end, Oracles),
+      {ok, [{ok, M} || M <- SortedOracles]}
   end.
