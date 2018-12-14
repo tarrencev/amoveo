@@ -20,7 +20,7 @@ RUN git checkout graphql
 
 RUN make prod-build
 RUN ls
-RUN chmod +x docker-entrypoint.sh
+RUN chmod +x ./docker-entrypoint.sh
 
 # Expose ports
 EXPOSE 8080
