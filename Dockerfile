@@ -19,7 +19,9 @@ RUN git clone https://github.com/tarrencev/amoveo.git .
 
 RUN make prod-build
 
+RUN chmod +x docker-entrypoint.sh
+
 # Expose ports
 EXPOSE 8080
 
-CMD ["make", "prod-restart"]
+CMD ["docker-entrypoint.sh"]
