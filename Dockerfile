@@ -16,12 +16,13 @@ RUN apt-get update && \
 WORKDIR /workspace
 
 RUN git clone https://github.com/tarrencev/amoveo.git .
+RUN git checkout graphql
 
 RUN make prod-build
-
+RUN ls
 RUN chmod +x docker-entrypoint.sh
 
 # Expose ports
 EXPOSE 8080
 
-CMD ["docker-entrypoint.sh"]
+CMD ["./docker-entrypoint.sh"]
