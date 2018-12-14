@@ -22,4 +22,4 @@ RUN make prod-build
 # Expose ports
 EXPOSE 8080
 
-CMD ["make", "prod-go"]
+CMD ["make", "prod-restart"]
