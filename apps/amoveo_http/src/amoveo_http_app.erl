@@ -37,7 +37,7 @@ start_external() ->
     Dispatch =
         cowboy_router:compile(
           [{'_', [{"/ext/:file", get_api_handler, []},
-          {'_', [{"/graphql", ext_graphql_handler, []},
+          {"/graphql", ext_graphql_handler, []},
 		  {"/:file", ext_file_handler, []},
                   {"/", ext_handler, []}
                  ]}]),
