@@ -1,0 +1,2 @@
+-record(orderproof, {value, root, path}).
+-record(governance, {}).

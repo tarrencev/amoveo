@@ -17,12 +17,12 @@ new_key() -> %We keep this around for the encryption library. it is used to gene
     generate(). %returns {Pub, Priv}
 new_key(X) when ((size(X) == 32) and is_binary(X)) ->
     crypto:generate_key(ecdh, params(), X).
-    
+
 sign(S, Priv) -> sign:sign(S, Priv).
 verify_sig(S, Sig, Pub) -> sign:verify_sig(S, Sig, Pub).
-verify_1(Tx, Pub) -> 
+verify_1(Tx, Pub) ->
     verify_sig(Tx#signed.data, Tx#signed.sig, Pub).
-verify_2(Tx, Pub) -> 
+verify_2(Tx, Pub) ->
     verify_sig(Tx#signed.data, Tx#signed.sig2, Pub).
 verify_both(Tx, Addr1, Addr2) ->
     X = verify_1(Tx, Addr1),
@@ -49,7 +49,7 @@ sign_tx(SignedTx, Pub, Priv) when element(1, SignedTx) == signed ->
     Tx = SignedTx#signed.data,
     N = element(2, Tx),
     if
-	(N == Pub)-> 
+	(N == Pub)->
 	    Sig = sign(Tx, Priv),
 	    SignedTx#signed{sig=Sig};
 	true ->
@@ -69,7 +69,7 @@ sign_tx(Tx, Pub, Priv) ->
     N = element(2, Tx),
     N2 = element(3, Tx),
     ST = if
-	(N == Pub) -> 
+	(N == Pub) ->
 	    #signed{data=Tx, sig=Sig};
 	(N2 == Pub) ->
 	    #signed{data=Tx, sig2=Sig};
@@ -95,7 +95,7 @@ test() ->
     Accounts1 = accounts:write(Acc, 1),
     Accounts = accounts:write(Acc2, Accounts1),
     Tx = {ctc, Pub, Pub2},
-    Signed1 = sign_tx(Tx, Pub, Priv), 
+    Signed1 = sign_tx(Tx, Pub, Priv),
     Signed = sign_tx(Signed1, Pub2, Priv2),
     Signed2 = sign_tx({spend, Pub, 0, Pub2, 1, 1}, Pub, Priv),
     Verbose = false,

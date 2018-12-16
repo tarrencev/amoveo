@@ -13,7 +13,7 @@
 reward(Bet, Correct, NewHeight) ->
     %returns {Shares, Tokens}
     ID = Bet#oracle_bet.id,
-    {Positive, _Negative} = 
+    {Positive, _Negative} =
 	case Correct of
 	    1->{Bet#oracle_bet.true,Bet#oracle_bet.false+Bet#oracle_bet.bad};
 	    2->{Bet#oracle_bet.false,Bet#oracle_bet.true+Bet#oracle_bet.bad};
@@ -37,14 +37,14 @@ increase(X, Type, A) ->
     end.
 new(ID, Type, Amount) ->
     <<_:256>> = ID,
-    {A, B, C} = 
+    {A, B, C} =
 	case Type of
 	    1 -> {Amount, 0, 0};
 	    2 -> {0, Amount, 0};
 	    3 -> {0, 0, Amount}
-	end, 
+	end,
     new(ID, A, B, C).
-    
+
 new(OracleID, True, False, Bad) ->
     %{_, X, _} = active_oracles:read(OracleID, AORoot),
     %false = X == empty,
@@ -79,12 +79,12 @@ dict_get(Key, Dict) ->
         0 -> empty;
         _ -> deserialize(X)
     end.
-key_to_int(X) -> 
+key_to_int(X) ->
     <<Y:256>> = hash:doit(X),
     Y.
 get(ID, Tree) ->
     {X, Leaf, Proof} = trie:get(key_to_int(ID), Tree, ?name),
-    V = case Leaf of 
+    V = case Leaf of
 	    empty -> empty;
 	    L -> deserialize(leaf:value(L))
 	end,
@@ -96,7 +96,7 @@ delete(ID, Tree) ->
 dict_add_bet(Pub, OID, Type, Amount, Dict) ->%changed
     A = accounts:dict_get(Pub, Dict),
     case A of
-	empty -> 
+	empty ->
 	    io:fwrite("account does not exist\n"),
 	    io:fwrite(base64:encode(Pub)),
 	    io:fwrite("\n"),
@@ -106,10 +106,10 @@ dict_add_bet(Pub, OID, Type, Amount, Dict) ->%changed
 	    Y = case X of
 		    empty -> new(OID, Type, Amount);
 		    Bet -> increase(Bet, Type, Amount)
-		end, 
+		end,
 	    dict_write(Y, Pub, Dict)
     end.
-    
+
 root_hash(A) ->
     trie:root_hash(?name, A).
 make_leaf(Key, V, CFG) ->
@@ -148,6 +148,3 @@ test2() ->
     io:fwrite("\n"),
     Bet2 = Bet3,
     success.
-    
-    
-

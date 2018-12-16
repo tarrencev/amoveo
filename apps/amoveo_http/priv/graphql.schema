@@ -1,0 +1,222 @@
+enum TransactionType {
+  COINBASE
+  SPEND
+  CREATE_ACCOUNT
+  DELETE_ACCOUNT
+  MULTI
+  NEW_CHANNEL
+  CHANNEL_TEAM_CLOSE
+  CHANNEL_SOLO_CLOSE
+  CHANNEL_SLASH
+  CHANNEL_TIMEOUT
+  ORACLE_NEW
+  ORACLE_BET
+  ORACLE_CLOSE
+  ORACLE_UNMATCHED
+  ORACLE_WINNINGS
+}
+
+type CoinbaseTransaction {
+  type: TransactionType
+  from: String
+  nonce: Int
+  fee: String
+}
+
+type SpendTransaction {
+  type: TransactionType
+  from: String
+  nonce: Int
+  fee: String
+  to: String
+  amount: String
+  version: Int
+  signature: String
+}
+
+type CreateAccountTransaction {
+  type: TransactionType
+  from: String
+  nonce: Int
+  fee: String
+  pubkey: String
+  amount: String
+  signature: String
+}
+
+type DeleteAccountTransaction {
+  type: TransactionType
+  from: String
+  nonce: Int
+  fee: String
+  to: String
+  signature: String
+}
+
+union Transaction = CoinbaseTransaction | SpendTransaction | CreateAccountTransaction | DeleteAccountTransaction
+
+type Block {
+  height: Int!
+  prevHash: String
+  treesHash: String
+  time: String
+  difficulty: String
+  period: Int
+  version: Int
+  nonce: String
+  marketCap: String
+  channelsVeo: Int
+  liveChannels: Int
+  manyAccounts: Int
+  manyOracles: Int
+  liveOracles: Int
+  transactions: [Transaction]
+}
+
+type Header {
+  height: Int!
+  prevHash: String
+  treesHash: String
+  txs_proofHash: String
+  time: Int
+  difficulty: Int
+  version: Int
+  nonce: String
+  accumulative_difficulty: String
+  period: Int
+}
+
+type Account {
+  balance: String
+  nonce: Int
+  pubkey: String
+  bets: String
+  betsHash: String
+}
+
+enum GovernanceEnum {
+  NONE
+  BLOCK_REWARD
+  DEVELOPER_REWARD
+  MAX_BLOCK_SIZE
+  BLOCK_PERIOD
+  TIME_GAS
+  SPACE_GAS
+  FUN_LIMIT
+  VAR_LIMIT
+  GOVERNANCE_CHANGE_LIMIT
+  ORACLE_INITIAL_LIQUIDITY
+  MINIMUM_ORACLE_TIME
+  MAXIMUM_ORACLE_TIME
+  MAXIMUM_QUESTION_SIZE
+  CREATE_ACC_TX
+  SPEND
+  DELETE_ACC_TX
+  NC
+  CTC
+  CSC
+  TIMEOUT
+  CS
+  EX
+  ORACLE_NEW
+  ORACLE_BET
+  ORACLE_CLOSE
+  UNMATCHED
+  ORACLE_WINNINGS
+  ORACLE_QUESTION_LIQUIDITY
+}
+
+enum OracleType {
+  EMPTY
+  TRUE
+  FALSE
+  BAD_QUESTION
+}
+
+type Order {
+  id: ID!
+  amount: String
+  rootHash: String
+  proof: [String]
+}
+
+type Oracle {
+  id: ID!
+  result: String
+  question: String
+  starts: Block
+  type: OracleType
+  orderTreeRoot: String
+  orders: [Order]
+  creator: String
+  ends: Block
+  governance: GovernanceEnum
+  governanceAmount: Int
+  unmatched: String
+}
+
+# type Key {
+#   id: ID
+#   pub: String
+# }
+#
+# type Bet {
+#   code: String
+#   amount: String
+#   key: String
+#   meta: String
+# }
+
+input SignedTransactionInput {
+  transaction: String!
+  sig: String!
+}
+
+type SignedTransactionPayload {
+  hash: String!
+}
+
+type Mutation {
+  submitSignedTransaction(input: SignedTransactionInput!)
+    : SignedTransactionPayload
+}
+
+type Governance {
+  blockReward: String
+  developerReward: String
+  maxBlockSize: String
+  blockPeriod: String
+  timeGas: String
+  spaceGas: String
+  funLimit: String
+  varLimit: String
+  governanceChangeLimit: String
+  oracleInitialLiquidity: String
+  minimumOracleTime: String
+  maximumOracleTime: String
+  maximumQuestionSize: String
+  createAccountTx: String
+  spendTx: String
+  deleteAccountTx: String
+  newChannelTx: String
+  channelTeamCloseTx: String
+  channelSoloCloseTx: String
+  channelTimeoutTx: String
+  channelSlashTx: String
+  existenceProofTx: String
+  oracleNewTx: String
+  oracleBetTx: String
+  oracleCloseTx: String
+  unmatchedTx: String
+  oracleWinningsTx: String
+  oracleQuestionLiquidity: String
+}
+
+type Query {
+  account(pubkey: String): Account
+  block(height: Int): Block
+  header(height: Int): Header
+  height: Int
+  oracles: [Oracle]
+  governance: Governance
+}

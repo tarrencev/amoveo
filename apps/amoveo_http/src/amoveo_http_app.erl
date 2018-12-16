@@ -12,6 +12,7 @@
 
 start(_StartType, _StartArgs) ->
     {ok, Pid} = amoveo_http_sup:start_link(),
+    ok = load_schema(),
     ok = start_internal(),
     ok = start_external(),
     {ok, Pid}.
@@ -35,7 +36,9 @@ start_internal() ->
 start_external() ->
     Dispatch =
         cowboy_router:compile(
-          [{'_', [{"/:file", ext_file_handler, []},
+          [{'_', [{"/ext/:file", get_api_handler, []},
+          {"/graphql", ext_graphql_handler, []},
+		  {"/:file", ext_file_handler, []},
                   {"/", ext_handler, []}
                  ]}]),
     {ok, Port} = application:get_env(amoveo_core, port),
@@ -44,3 +47,39 @@ start_external() ->
                                 [{env, [{dispatch, Dispatch}]}]),
     ok.
 
+load_schema() ->
+    {ok, SchemaFile} = application:get_env(amoveo_http, schema_file),
+    PrivDir = code:priv_dir(amoveo_http),
+    {ok, SchemaData} = file:read_file(
+                         filename:join(PrivDir, SchemaFile)),
+    Mapping = #{
+      enums => #{ 'TransactionType' => graphql_enum,
+                  'GovernanceOracleVariable' => graphql_enum,
+                  'OracleType' => graphql_enum,
+                   default   => graphql_enum },
+       interfaces => #{ default => graphql_type },
+       unions => #{ default => graphql_unions },
+       objects => #{
+         'Account' => graphql_account,
+         'Block' => graphql_block,
+         'Header' => graphql_header,
+         'CoinbaseTransaction' => graphql_coinbase_transaction,
+         'CreateAccountTransaction' => graphql_create_account_transaction,
+         'DeleteAccountTransaction' => graphql_delete_account_transaction,
+         'Governance' => graphql_governance,
+         'Oracle' => graphql_oracle,
+         'Order' => graphql_order,
+         'SpendTransaction' => graphql_spend_transaction,
+         'SignedTransactionPayload' => graphql_transaction_hash,
+         'Query' => graphql_query,
+         'Mutation' => graphql_mutation,
+         default => graphql_object }
+     },
+    ok = graphql:load_schema(Mapping, SchemaData),
+    Root = {root,
+            #{ query => 'Query',
+               mutation => 'Mutation'
+             }},
+    ok = graphql:insert_schema_definition(Root),
+    ok = graphql:validate_schema(),
+    ok.
