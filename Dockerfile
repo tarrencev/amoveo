@@ -15,8 +15,9 @@ RUN apt-get update && \
 
 WORKDIR /workspace
 
-RUN git clone https://github.com/tarrencev/amoveo.git .
-RUN git checkout graphql
+RUN git clone https://github.com/tarrencev/amoveo.git . && \
+    git checkout graphql && \
+    git checkout f91c5809c1a2741ab9229b2310e6738dc6bc4dbe
 
 RUN make prod-build
 RUN ls
